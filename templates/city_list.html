@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Cities – Santé{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">Monitored Cities</h1>
+    <a href="{{ url_for('cities.upload') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      Add New City
+    </a>
+  </div>
+
+  {% if cities %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for city in cities %}
+        <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-semibold text-gray-800">{{ city.name }}</h3>
+              <span class="text-sm text-gray-500">{{ city.created_at.strftime('%Y-%m-%d') }}</span>
+            </div>
+            
+            <div class="space-y-2 mb-4">
+              <p class="text-sm text-gray-600">
+                <span class="font-medium">Location:</span> 
+                {% if city.state %}{{ city.state }}{% endif %}{% if city.country %}, {{ city.country }}{% endif %}
+              </p>
+              <p class="text-sm text-gray-600">
+                <span class="font-medium">Observations:</span> {{ city.observations|length }} data points
+              </p>
+            </div>
+
+            {% if city.id in ind_map %}
+              {% set ind = ind_map[city.id] %}
+              <div class="border-t pt-4">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-sm font-medium text-gray-600">Risk Level:</span>
+                  <span class="px-2 py-1 text-xs font-bold rounded-full {{ 'bg-red-100 text-red-800' if ind.rt > 1 else 'bg-yellow-100 text-yellow-800' }}">
+                    {{ 'HIGH' if ind.rt > 1 else 'MEDIUM' }}
+                  </span>
+                </div>
+                <div class="text-sm text-gray-600">
+                  <span class="font-medium">R(t):</span> {{ ind.rt }}
+                </div>
+              </div>
+            {% endif %}
+
+            <div class="mt-4">
+              <a href="{{ url_for('dashboard.view_city', city_id=city.id) }}" 
+                 class="block w-full text-center bg-gray-100 text-gray-700 py-2 px-4 rounded hover:bg-gray-200 transition-colors">
+                View Dashboard
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center py-12">
+      <div class="text-gray-400 mb-4">
+        <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No cities yet</h3>
+      <p class="text-gray-500 mb-6">Get started by uploading your first CSV file with epidemiological data.</p>
+      <a href="{{ url_for('cities.upload') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+        Upload First City
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Upload CSV – Santé{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  <div class="bg-white rounded shadow p-6">
+    <h1 class="text-2xl font-bold mb-6">Upload CSV Data</h1>
+    
+    <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded">
+      <h3 class="font-semibold text-blue-800 mb-2">Required CSV Format:</h3>
+      <p class="text-blue-700 text-sm">Your CSV must contain these columns:</p>
+      <ul class="text-blue-700 text-sm mt-2 list-disc list-inside">
+        <li><code>city</code> - City name</li>
+        <li><code>state</code> - State/province</li>
+        <li><code>country</code> - Country</li>
+        <li><code>week_label</code> - Week identifier (e.g., "Wk 40")</li>
+        <li><code>cases</code> - Number of cases</li>
+      </ul>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+      <div>
+        <label for="file" class="block text-sm font-medium text-gray-700 mb-2">
+          Select CSV File
+        </label>
+        <input type="file" id="file" name="file" accept=".csv" required
+               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+      </div>
+      
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+        Upload and Process
+      </button>
+    </form>
+
+    <div class="mt-6 p-4 bg-gray-50 border border-gray-200 rounded">
+      <h3 class="font-semibold text-gray-800 mb-2">What happens next?</h3>
+      <ol class="text-gray-700 text-sm list-decimal list-inside space-y-1">
+        <li>CSV data is validated and processed</li>
+        <li>City is created/updated in the system</li>
+        <li>Epidemiological indicators are calculated</li>
+        <li>You're redirected to the city dashboard</li>
+      </ol>
+    </div>
+
+    <div class="mt-6 p-4 bg-gray-50 border border-gray-200 rounded">
+      <h3 class="font-semibold text-gray-800 mb-2">Sample CSV Files</h3>
+      <p class="text-gray-700 text-sm mb-3">Download example files to test the system:</p>
+      <div class="space-y-2">
+        <a href="{{ url_for('static', filename='sample_data.csv') }}" class="block text-blue-600 hover:text-blue-800 text-sm">
+          📊 Recife, Brazil - Sample Data
+        </a>
+        <a href="{{ url_for('static', filename='new_york_data.csv') }}" class="block text-blue-600 hover:text-blue-800 text-sm">
+          🗽 New York, USA - Sample Data
+        </a>
+        <a href="{{ url_for('static', filename='freetown_data.csv') }}" class="block text-blue-600 hover:text-blue-800 text-sm">
+          🌍 Freetown, Sierra Leone - Sample Data
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
