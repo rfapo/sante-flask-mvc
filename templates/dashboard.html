@@ -5,26 +5,25 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
     .card {
-        background-color: white;
-        border-radius: 0.75rem;
-        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        background-color: var(--accent-purple);
+        border: 1px solid var(--border-subtle);
+        border-radius: 8px;
         padding: 1.5rem;
-        transition: all 0.3s ease-in-out;
-        display: flex;
-        flex-direction: column;
+        transition: all 0.3s ease;
     }
     .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(138, 125, 149, 0.3);
     }
-    .impact-bar-positive { background-color: #fca5a5; }
-    .impact-bar-negative { background-color: #86efac; }
+    .impact-bar-positive { background-color: #ef4444; }
+    .impact-bar-negative { background-color: #22c55e; }
     .tooltip { position: relative; display: inline-block; width: 100%; }
     .tooltip .tooltiptext {
-        visibility: hidden; width: 220px; background-color: #333; color: #fff; text-align: center;
+        visibility: hidden; width: 220px; background-color: var(--accent-purple); color: var(--text-light); text-align: center;
         border-radius: 6px; padding: 5px 10px; position: absolute; z-index: 1; bottom: 125%;
         left: 50%; margin-left: -110px; opacity: 0; transition: opacity 0.3s;
         font-size: 0.75rem; font-weight: 400;
+        border: 1px solid var(--border-subtle);
     }
     .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
 
@@ -47,7 +46,7 @@
         align-items: center;
         gap: 0.5rem;
         font-size: 0.875rem;
-        color: #6b7280;
+        color: var(--border-subtle);
     }
     .legend-color {
         width: 1rem;
@@ -72,15 +71,16 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto">
-  <header class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-800">Influenza Predictive Intelligence</h1>
-    <p class="text-gray-500">Dashboard for: {{ city.name }}{% if city.state %}, {{ city.state }}{% endif %}{% if city.country %}, {{ city.country }}{% endif %}</p>
+  <header class="text-center mb-8">
+    <img src="{{ url_for('static', filename='sante_logo.png') }}" alt="Santé Logo" class="mx-auto h-16 w-auto mb-4">
+    <h1 class="text-3xl font-bold text-text-light mb-2">Influenza Predictive Intelligence</h1>
+    <p class="text-border-subtle text-lg">Dashboard for: {{ city.name }}{% if city.state %}, {{ city.state }}{% endif %}{% if city.country %}, {{ city.country }}{% endif %}</p>
   </header>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Top-Left Chart -->
     <div class="lg:col-span-2 card">
-      <h2 class="text-xl font-semibold text-gray-700 mb-4">Case Evolution & Forecast</h2>
+      <h2 class="text-xl font-semibold text-text-light mb-4">Case Evolution & Forecast</h2>
       <div class="relative h-96">
         <canvas id="evolutionChart"></canvas>
       </div>
@@ -89,9 +89,9 @@
     <!-- Top-Right Cards -->
     <div class="lg:col-span-1 space-y-6 flex flex-col">
       <div class="card text-center flex-grow">
-        <h3 class="text-lg font-medium text-gray-500">Next 3 Weeks Forecast</h3>
-        <p class="text-4xl font-bold text-blue-600 mt-2">~{{ forecast[0] }} cases</p>
-        <p class="text-sm {{ 'text-red-600' if ind.rt>1 else 'text-green-600' }} font-medium flex items-center justify-center mt-2">
+        <h3 class="text-lg font-medium text-border-subtle">Next 3 Weeks Forecast</h3>
+        <p class="text-4xl font-bold text-text-light mt-2">~{{ forecast[0] }} cases</p>
+        <p class="text-sm {{ 'text-red-400' if ind.rt>1 else 'text-green-400' }} font-medium flex items-center justify-center mt-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             {% if ind.rt>1 %}
               <path stroke-linecap="round" stroke-linejoin="round" d="M7 11l5-5m0 0l5 5m-5-5v12" />
@@ -103,18 +103,18 @@
         </p>
       </div>
       <div class="card text-center flex-grow">
-        <h3 class="text-lg font-medium text-gray-500 mb-3">Early Warning System</h3>
+        <h3 class="text-lg font-medium text-border-subtle mb-3">Early Warning System</h3>
         <div class="alert-badge {{ 'alert-red' if ind.rt>1 else 'alert-yellow' }} mb-2">
           {{ 'RED ALERT' if ind.rt>1 else 'YELLOW ALERT' }}
         </div>
-        <p class="text-sm text-gray-600">R(t): <strong>{{ ind.rt }}</strong>, threshold = 1.0</p>
-        <p class="text-xs text-gray-400 mt-2">Action: {{ 'Consider strengthening public health advisories.' if ind.rt>1 else 'Sustain mitigation and monitor.' }}</p>
+        <p class="text-sm text-border-subtle">R(t): <strong>{{ ind.rt }}</strong>, threshold = 1.0</p>
+        <p class="text-xs text-border-subtle/70 mt-2">Action: {{ 'Consider strengthening public health advisories.' if ind.rt>1 else 'Sustain mitigation and monitor.' }}</p>
       </div>
     </div>
 
     <!-- Bottom-Left Map -->
     <div class="lg:col-span-2 card">
-      <h2 class="text-xl font-semibold text-gray-700 mb-4">Risk Map & Geographic Distribution</h2>
+      <h2 class="text-xl font-semibold text-text-light mb-4">Risk Map & Geographic Distribution</h2>
       <div id="risk-map"></div>
       <div class="map-legend">
         <div class="legend-item">
@@ -134,47 +134,47 @@
 
     <!-- Bottom-Right Card -->
     <div class="lg:col-span-1 card">
-      <h3 class="text-lg font-medium text-gray-500 mb-3">Key Indicators</h3>
+      <h3 class="text-lg font-medium text-border-subtle mb-3">Key Indicators</h3>
       <div class="space-y-3">
         <div class="flex justify-between items-center">
-          <span class="font-medium text-gray-600">R(t) - Transmission Rate</span>
-          <span class="font-bold text-lg {{ 'text-red-500' if ind.rt>1 else 'text-orange-500' }}">{{ ind.rt }}</span>
+          <span class="font-medium text-border-subtle">R(t) - Transmission Rate</span>
+          <span class="font-bold text-lg {{ 'text-red-400' if ind.rt>1 else 'text-orange-400' }}">{{ ind.rt }}</span>
         </div>
         <div class="flex justify-between items-center">
-          <span class="font-medium text-gray-600">R0 - Basic Reproduction No.</span>
-          <span class="font-bold text-lg text-red-500">{{ ind.r0 }}</span>
+          <span class="font-medium text-border-subtle">R0 - Basic Reproduction No.</span>
+          <span class="font-bold text-lg text-red-400">{{ ind.r0 }}</span>
         </div>
         <div class="flex justify-between items-center">
-          <span class="font-medium text-gray-600">Hospitalization Rate</span>
-          <span class="font-bold text-lg text-red-500">{{ ind.hospitalization_rate }}%</span>
+          <span class="font-medium text-border-subtle">Hospitalization Rate</span>
+          <span class="font-bold text-lg text-red-400">{{ ind.hospitalization_rate }}%</span>
         </div>
       </div>
     </div>
 
     <!-- Explainability (XAI) -->
     <div class="lg:col-span-3 card">
-      <h2 class="text-xl font-semibold text-gray-700 mb-4">Explainability (XAI): Factors Influencing Forecast</h2>
+      <h2 class="text-xl font-semibold text-text-light mb-4">Explainability (XAI): Factors Influencing Forecast</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6">
         <!-- Public Health & Socioeconomic -->
         <div>
-          <h3 class="font-semibold text-gray-600 border-b pb-2 mb-2">Public Health & Socioeconomic</h3>
+          <h3 class="font-semibold text-border-subtle border-b border-border-subtle pb-2 mb-2">Public Health & Socioeconomic</h3>
           <div class="space-y-3">
             <div class="tooltip">
-              <span class="font-medium text-sm">Vaccine Coverage <span class="text-gray-400">(?)</span></span>
-              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1"><div class="impact-bar-negative h-2.5 rounded-full" style="width: 90%"></div></div>
-              <p class="text-xs text-right text-green-500 font-bold">High Impact (-30%)</p>
+              <span class="font-medium text-sm text-text-light">Vaccine Coverage <span class="text-border-subtle/60">(?)</span></span>
+              <div class="w-full bg-background-dark rounded-full h-2.5 mt-1"><div class="impact-bar-negative h-2.5 rounded-full" style="width: 90%"></div></div>
+              <p class="text-xs text-right text-green-400 font-bold">High Impact (-30%)</p>
               <span class="tooltiptext">High vaccination rates are the most effective measure to reduce overall cases and severity.</span>
             </div>
             <div class="tooltip">
-              <span class="font-medium text-sm">Wastewater Surveillance <span class="text-gray-400">(?)</span></span>
-              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 75%"></div></div>
-              <p class="text-xs text-right text-red-500 font-bold">High Impact (+20%)</p>
+              <span class="font-medium text-sm text-text-light">Wastewater Surveillance <span class="text-border-subtle/60">(?)</span></span>
+              <div class="w-full bg-background-dark rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 75%"></div></div>
+              <p class="text-xs text-right text-red-400 font-bold">High Impact (+20%)</p>
               <span class="tooltiptext">Detects viral RNA in sewage, providing an early, non-invasive indicator of community infection levels.</span>
             </div>
             <div class="tooltip">
-              <span class="font-medium text-sm">Anti-flu Drug Sales <span class="text-gray-400">(?)</span></span>
-              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 55%"></div></div>
-              <p class="text-xs text-right text-red-500 font-bold">Moderate Impact (+12%)</p>
+              <span class="font-medium text-sm text-text-light">Anti-flu Drug Sales <span class="text-border-subtle/60">(?)</span></span>
+              <div class="w-full bg-background-dark rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 55%"></div></div>
+              <p class="text-xs text-right text-red-400 font-bold">Moderate Impact (+12%)</p>
               <span class="tooltiptext">Increased sales of over-the-counter flu medication can signal a rise in symptomatic illness.</span>
             </div>
           </div>
@@ -182,24 +182,24 @@
 
         <!-- Digital Surveillance -->
         <div>
-          <h3 class="font-semibold text-gray-600 border-b pb-2 mb-2">Digital Surveillance</h3>
+          <h3 class="font-semibold text-border-subtle border-b border-border-subtle pb-2 mb-2">Digital Surveillance</h3>
           <div class="space-y-3">
             <div class="tooltip">
-              <span class="font-medium text-sm">Google Trends (Symptoms) <span class="text-gray-400">(?)</span></span>
-              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 65%"></div></div>
-              <p class="text-xs text-right text-red-500 font-bold">Moderate Impact (+16%)</p>
+              <span class="font-medium text-sm text-text-light">Google Trends (Symptoms) <span class="text-border-subtle/60">(?)</span></span>
+              <div class="w-full bg-background-dark rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 65%"></div></div>
+              <p class="text-xs text-right text-red-400 font-bold">Moderate Impact (+16%)</p>
               <span class="tooltiptext">Higher search volume for flu-related symptoms often precedes official case reports.</span>
             </div>
             <div class="tooltip">
-              <span class="font-medium text-sm">Social Listening <span class="text-gray-400">(?)</span></span>
-              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 40%"></div></div>
-              <p class="text-xs text-right text-red-500 font-bold">Low Impact (+7%)</p>
+              <span class="font-medium text-sm text-text-light">Social Listening <span class="text-border-subtle/60">(?)</span></span>
+              <div class="w-full bg-background-dark rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 40%"></div></div>
+              <p class="text-xs text-right text-red-400 font-bold">Low Impact (+7%)</p>
               <span class="tooltiptext">Analysis of public social media posts mentioning symptoms or illness can provide real-time insights.</span>
             </div>
             <div class="tooltip">
-              <span class="font-medium text-sm">Media Coverage <span class="text-gray-400">(?)</span></span>
-              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1"><div class="impact-bar-negative h-2.5 rounded-full" style="width: 35%"></div></div>
-              <p class="text-xs text-right text-green-500 font-bold">Low Impact (-6%)</p>
+              <span class="font-medium text-sm text-text-light">Media Coverage <span class="text-border-subtle/60">(?)</span></span>
+              <div class="w-full bg-background-dark rounded-full h-2.5 mt-1"><div class="impact-bar-negative h-2.5 rounded-full" style="width: 35%"></div></div>
+              <p class="text-xs text-right text-green-400 font-bold">Low Impact (-6%)</p>
               <span class="tooltiptext">Increased media coverage can raise public awareness and encourage preventative behaviors.</span>
             </div>
           </div>
@@ -207,24 +207,24 @@
         
         <!-- Mobility & Demographics -->
         <div>
-          <h3 class="font-semibold text-gray-600 border-b pb-2 mb-2">Mobility & Demographics</h3>
+          <h3 class="font-semibold text-border-subtle border-b border-border-subtle pb-2 mb-2">Mobility & Demographics</h3>
           <div class="space-y-3">
             <div class="tooltip">
-              <span class="font-medium text-sm">Population Density <span class="text-gray-400">(?)</span></span>
-              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 70%"></div></div>
-              <p class="text-xs text-right text-red-500 font-bold">High Impact (+18%)</p>
+              <span class="font-medium text-sm text-text-light">Population Density <span class="text-border-subtle/60">(?)</span></span>
+              <div class="w-full bg-background-dark rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 70%"></div></div>
+              <p class="text-xs text-right text-red-400 font-bold">High Impact (+18%)</p>
               <span class="tooltiptext">Higher density increases the probability of transmission events.</span>
             </div>
             <div class="tooltip">
-              <span class="font-medium text-sm">Displacement Rate <span class="text-gray-400">(?)</span></span>
-              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 50%"></div></div>
-              <p class="text-xs text-right text-red-500 font-bold">Moderate Impact (+10%)</p>
+              <span class="font-medium text-sm text-text-light">Displacement Rate <span class="text-border-subtle/60">(?)</span></span>
+              <div class="w-full bg-background-dark rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 50%"></div></div>
+              <p class="text-xs text-right text-red-400 font-bold">Moderate Impact (+10%)</p>
               <span class="tooltiptext">Movement of people between different areas indicates potential for wider virus spread.</span>
             </div>
             <div class="tooltip">
-              <span class="font-medium text-sm">Workplace Attendance <span class="text-gray-400">(?)</span></span>
-              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 55%"></div></div>
-              <p class="text-xs text-right text-red-500 font-bold">Moderate Impact (+12%)</p>
+              <span class="font-medium text-sm text-text-light">Workplace Attendance <span class="text-border-subtle/60">(?)</span></span>
+              <div class="w-full bg-background-dark rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 55%"></div></div>
+              <p class="text-xs text-right text-red-400 font-bold">Moderate Impact (+12%)</p>
               <span class="tooltiptext">More people in offices increases contact rates and potential transmission.</span>
             </div>
           </div>
@@ -232,24 +232,24 @@
 
         <!-- Environmental & Land Use -->
         <div>
-          <h3 class="font-semibold text-gray-600 border-b pb-2 mb-2">Environmental & Land Use</h3>
+          <h3 class="font-semibold text-border-subtle border-b border-border-subtle pb-2 mb-2">Environmental & Land Use</h3>
           <div class="space-y-3">
             <div class="tooltip">
-              <span class="font-medium text-sm">Seasonality (Fall/Winter) <span class="text-gray-400">(?)</span></span>
-              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 85%"></div></div>
-              <p class="text-xs text-right text-red-500 font-bold">High Impact (+25%)</p>
+              <span class="font-medium text-sm text-text-light">Seasonality (Fall/Winter) <span class="text-border-subtle/60">(?)</span></span>
+              <div class="w-full bg-background-dark rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 85%"></div></div>
+              <p class="text-xs text-right text-red-400 font-bold">High Impact (+25%)</p>
               <span class="tooltiptext">Colder months increase indoor transmission, a primary driver of influenza spread.</span>
             </div>
             <div class="tooltip">
-              <span class="font-medium text-sm">Land Cover (Impervious) <span class="text-gray-400">(?)</span></span>
-              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 30%"></div></div>
-              <p class="text-xs text-right text-red-500 font-bold">Low Impact (+5%)</p>
+              <span class="font-medium text-sm text-text-light">Land Cover (Impervious) <span class="text-border-subtle/60">(?)</span></span>
+              <div class="w-full bg-background-dark rounded-full h-2.5 mt-1"><div class="impact-bar-positive h-2.5 rounded-full" style="width: 30%"></div></div>
+              <p class="text-xs text-right text-red-400 font-bold">Low Impact (+5%)</p>
               <span class="tooltiptext">High percentage of impervious surfaces correlates with urban density.</span>
             </div>
             <div class="tooltip">
-              <span class="font-medium text-sm">Vegetation Coverage <span class="text-gray-400">(?)</span></span>
-              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1"><div class="impact-bar-negative h-2.5 rounded-full" style="width: 25%"></div></div>
-              <p class="text-xs text-right text-green-500 font-bold">Low Impact (-4%)</p>
+              <span class="font-medium text-sm text-text-light">Vegetation Coverage <span class="text-border-subtle/60">(?)</span></span>
+              <div class="w-full bg-background-dark rounded-full h-2.5 mt-1"><div class="impact-bar-negative h-2.5 rounded-full" style="width: 25%"></div></div>
+              <p class="text-xs text-right text-green-400 font-bold">Low Impact (-4%)</p>
               <span class="tooltiptext">While more critical for vector-borne diseases, it can correlate with population density and park usage.</span>
             </div>
           </div>
@@ -259,16 +259,16 @@
 
     <!-- Model Applicability -->
     <div class="lg:col-span-3 card">
-      <h2 class="text-xl font-semibold text-gray-700 mb-4">Model Applicability & Expansion</h2>
-      <p class="text-gray-600">This predictive framework is designed to be flexible. While currently configured for Influenza (an <strong class="text-blue-500">airborne</strong> disease), it can be adapted for other epidemiological scenarios by modifying the input variables.</p>
+      <h2 class="text-xl font-semibold text-text-light mb-4">Model Applicability & Expansion</h2>
+      <p class="text-border-subtle">This predictive framework is designed to be flexible. While currently configured for Influenza (an <strong class="text-text-light">airborne</strong> disease), it can be adapted for other epidemiological scenarios by modifying the input variables.</p>
       <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
         <div>
-          <h4 class="font-semibold text-green-500">Vector-Borne Diseases (e.g., Dengue)</h4>
-          <p class="text-gray-500">Would prioritize environmental variables like: precipitation, temperature, land use (vegetation, water bodies), and vector control data.</p>
+          <h4 class="font-semibold text-green-400">Vector-Borne Diseases (e.g., Dengue)</h4>
+          <p class="text-border-subtle/80">Would prioritize environmental variables like: precipitation, temperature, land use (vegetation, water bodies), and vector control data.</p>
         </div>
         <div>
-          <h4 class="font-semibold text-red-500">Water-Borne Diseases (e.g., Cholera)</h4>
-          <p class="text-gray-500">Would focus on variables such as: sanitation coverage, water quality reports, flood risk maps, and precipitation levels.</p>
+          <h4 class="font-semibold text-red-400">Water-Borne Diseases (e.g., Cholera)</h4>
+          <p class="text-border-subtle/80">Would focus on variables such as: sanitation coverage, water quality reports, flood risk maps, and precipitation levels.</p>
         </div>
       </div>
     </div>
@@ -295,8 +295,8 @@ document.addEventListener('DOMContentLoaded', function () {
       datasets: [{
         label: 'Historical Cases',
         data: historicalData,
-        borderColor: 'rgb(59, 130, 246)',
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        borderColor: 'rgb(138, 125, 149)',
+        backgroundColor: 'rgba(138, 125, 149, 0.1)',
         fill: true,
         tension: 0.4,
         pointRadius: 3,
@@ -304,8 +304,8 @@ document.addEventListener('DOMContentLoaded', function () {
       }, {
         label: 'Forecast',
         data: new Array(historicalData.length-1).fill(null).concat([historicalData[historicalData.length-1]]).concat(forecastData),
-        borderColor: 'rgb(234, 88, 12)',
-        backgroundColor: 'rgba(234, 88, 12, 0.1)',
+        borderColor: 'rgb(61, 43, 79)',
+        backgroundColor: 'rgba(61, 43, 79, 0.1)',
         borderDash: [5, 5],
         fill: true,
         tension: 0.4,
@@ -317,10 +317,25 @@ document.addEventListener('DOMContentLoaded', function () {
       responsive: true,
       maintainAspectRatio: false,
       scales: {
-        y: { beginAtZero: true, title: { display: true, text: 'Number of Reported Cases' } },
-        x: { title: { display: true, text: 'Week of the Year' } }
+        y: { 
+          beginAtZero: true, 
+          title: { display: true, text: 'Number of Reported Cases' },
+          grid: { color: 'rgba(138, 125, 149, 0.2)' },
+          ticks: { color: 'rgb(138, 125, 149)' }
+        },
+        x: { 
+          title: { display: true, text: 'Week of the Year' },
+          grid: { color: 'rgba(138, 125, 149, 0.2)' },
+          ticks: { color: 'rgb(138, 125, 149)' }
+        }
       },
-      plugins: { legend: { position: 'top' }, tooltip: { mode: 'index', intersect: false } },
+      plugins: { 
+        legend: { 
+          position: 'top',
+          labels: { color: 'rgb(255, 255, 255)' }
+        }, 
+        tooltip: { mode: 'index', intersect: false } 
+      },
       interaction: { mode: 'index', intersect: false }
     }
   });

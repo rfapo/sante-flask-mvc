@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
 {% block title %}Login – Santé{% endblock %}
 {% block content %}
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
   <div class="max-w-md w-full space-y-8">
-    <div>
-      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+    <div class="text-center">
+      <img src="{{ url_for('static', filename='sante_logo.png') }}" alt="Santé Logo" class="mx-auto h-16 w-auto mb-6">
+      <h2 class="mt-6 text-center text-3xl font-extrabold text-text-light">
         Sign in to Santé
       </h2>
-      <p class="mt-2 text-center text-sm text-gray-600">
+      <p class="mt-2 text-center text-sm text-border-subtle">
         Access your epidemiological surveillance dashboard
       </p>
     </div>
@@ -15,16 +16,16 @@
       <div class="rounded-md shadow-sm -space-y-px">
         <div>
           <label for="username" class="sr-only">Username</label>
-          <input id="username" name="username" type="text" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Username">
+          <input id="username" name="username" type="text" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-border-subtle placeholder-border-subtle text-black rounded-t-md focus:outline-none focus:ring-accent-purple focus:border-accent-purple focus:z-10 sm:text-sm bg-background-dark" placeholder="Username">
         </div>
         <div>
           <label for="password" class="sr-only">Password</label>
-          <input id="password" name="password" type="password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Password">
+          <input id="password" name="password" type="password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-border-subtle placeholder-border-subtle text-black rounded-b-md focus:outline-none focus:ring-accent-purple focus:border-accent-purple focus:z-10 sm:text-sm bg-background-dark" placeholder="Password">
         </div>
       </div>
 
       <div>
-        <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-background-dark bg-border-subtle hover:bg-accent-purple hover:text-text-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-purple transition-colors">
           Sign in
         </button>
       </div>

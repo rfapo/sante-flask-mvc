@@ -2,31 +2,40 @@
 {% block title %}Santé – Predictive Intelligence in Health{% endblock %}
 {% block content %}
 <div class="grid grid-cols-1 gap-6">
-  <div class="bg-white rounded shadow p-6">
-    <h1 class="text-2xl font-bold">Santé – Intelligent Epidemiological Surveillance</h1>
-    <p class="mt-2 text-gray-600">
+  <div class="text-center mb-8">
+    <img src="{{ url_for('static', filename='sante_logo.png') }}" alt="Santé Logo" class="mx-auto h-20 w-auto mb-6">
+    <h1 class="text-4xl font-bold text-text-light mb-4">Santé – Intelligent Epidemiological Surveillance</h1>
+    <p class="text-xl text-border-subtle max-w-3xl mx-auto">
+      Advanced monitoring and prediction of epidemiological outbreaks at the municipal level
+    </p>
+  </div>
+
+  <div class="card">
+    <h2 class="text-2xl font-semibold text-text-light mb-4">About Santé</h2>
+    <p class="text-border-subtle text-lg leading-relaxed mb-6">
       <strong>Santé</strong> is a solution to monitor and anticipate epidemiological outbreaks at the municipal level.
       The platform integrates clinical data, digital signals (e.g., symptom searches), environmental and demographic data to compose
       a <em>nowcasting</em> and short-term <em>forecast</em>, supporting managers in decision making.
     </p>
-    <ul class="mt-4 list-disc list-inside text-gray-600">
-      <li>Data ingestion via <strong>CSV upload</strong> by city.</li>
-      <li>Key indicators such as <strong>R(t)</strong>, <strong>R0</strong> and <strong>hospitalization rate</strong>.</li>
-      <li>Interactive dashboard inspired by the provided prototype.</li>
+    <ul class="text-border-subtle text-base space-y-2 mb-6">
+      <li>• Data ingestion via <strong>CSV upload</strong> by city.</li>
+      <li>• Key indicators such as <strong>R(t)</strong>, <strong>R0</strong> and <strong>hospitalization rate</strong>.</li>
+      <li>• Interactive dashboard inspired by the provided prototype.</li>
     </ul>
-    <div class="mt-6 flex gap-3">
-      <a href="{{ url_for('cities.upload') }}" class="bg-gray-900 text-white px-4 py-2 rounded">Create New City</a>
-      <a href="{{ url_for('cities.list_cities') }}" class="bg-white border px-4 py-2 rounded">View Cities</a>
+    <div class="flex gap-4 justify-center">
+      <a href="{{ url_for('cities.upload') }}" class="button">Create New City</a>
+      <a href="{{ url_for('cities.list_cities') }}" class="button">View Cities</a>
     </div>
   </div>
-  <div class="bg-white rounded shadow p-6">
-    <h2 class="text-xl font-semibold">How to Use</h2>
-    <ol class="list-decimal list-inside text-gray-600 mt-2 space-y-1">
-      <li>Login.</li>
-      <li>Go to <em>Upload CSV</em> and send a file with columns: <code>city,state,country,week_label,cases</code>.</li>
+  
+  <div class="card">
+    <h2 class="text-2xl font-semibold text-text-light mb-4">How to Use</h2>
+    <ol class="text-border-subtle text-base mt-4 space-y-2 list-decimal list-inside">
+      <li>Login to your account.</li>
+      <li>Go to <em>Upload CSV</em> and send a file with columns: <code class="bg-background-dark px-2 py-1 rounded text-border-subtle font-mono border border-border-subtle">city,state,country,week_label,cases</code>.</li>
       <li>After processing, you will be redirected to the city dashboard.</li>
     </ol>
-    <p class="text-sm text-gray-500 mt-2">This project is an educational MVP; in production, adjust ingestion, validation and predictive models.</p>
+    <p class="text-sm text-border-subtle mt-4 italic">This project is an educational MVP; in production, adjust ingestion, validation and predictive models.</p>
   </div>
 </div>
 {% endblock %}
