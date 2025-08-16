@@ -77,6 +77,16 @@
     <p class="text-border-subtle text-lg">Dashboard for: {{ city.name }}{% if city.state %}, {{ city.state }}{% endif %}{% if city.country %}, {{ city.country }}{% endif %}</p>
   </header>
 
+  <!-- Dispatch Report Generation -->
+  <div class="text-center mb-8">
+    <form method="POST" action="{{ url_for('dashboard.generate_report', city_id=city.id) }}" class="inline-block">
+      <button type="submit" class="bg-accent-purple hover:bg-purple-700 text-text-light hover:text-background-dark px-8 py-3 rounded-lg font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg" style="background-color: var(--accent-purple);">
+        🤖 Generate Dispatch Report
+      </button>
+    </form>
+    <p class="text-border-subtle text-sm mt-2">AI-powered executive summary for health authorities</p>
+  </div>
+
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Top-Left Chart -->
     <div class="lg:col-span-2 card">
@@ -295,8 +305,8 @@ document.addEventListener('DOMContentLoaded', function () {
       datasets: [{
         label: 'Historical Cases',
         data: historicalData,
-        borderColor: 'rgb(138, 125, 149)',
-        backgroundColor: 'rgba(138, 125, 149, 0.1)',
+        borderColor: 'rgb(239, 68, 68)', // Red color
+        backgroundColor: 'rgba(239, 68, 68, 0.1)', // Red with transparency
         fill: true,
         tension: 0.4,
         pointRadius: 3,
@@ -304,8 +314,8 @@ document.addEventListener('DOMContentLoaded', function () {
       }, {
         label: 'Forecast',
         data: new Array(historicalData.length-1).fill(null).concat([historicalData[historicalData.length-1]]).concat(forecastData),
-        borderColor: 'rgb(61, 43, 79)',
-        backgroundColor: 'rgba(61, 43, 79, 0.1)',
+        borderColor: 'rgb(59, 130, 246)', // Blue color
+        backgroundColor: 'rgba(59, 130, 246, 0.1)', // Blue with transparency
         borderDash: [5, 5],
         fill: true,
         tension: 0.4,

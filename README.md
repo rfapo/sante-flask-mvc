@@ -76,6 +76,7 @@ Veja a seção "Sample CSV Files" na página de upload para baixar os exemplos.
 - **XAI**: Explicabilidade dos fatores que influenciam as previsões
 - **🌍 Mapa Interativo**: Mapa de risco com OpenStreetMap e heatmap
 - **🌐 Interface em Inglês**: Interface completamente traduzida
+- **🤖 Relatórios Executivos**: Geração automática de relatórios com OpenAI
 
 ## Novas Funcionalidades Implementadas
 
@@ -92,6 +93,13 @@ Veja a seção "Sample CSV Files" na página de upload para baixar os exemplos.
 - **Dashboard**: Todos os elementos traduzidos para inglês
 - **Navegação**: Menu e navegação em inglês
 - **Mensagens**: Flash messages e feedback em inglês
+
+### 🤖 Relatórios Executivos com OpenAI
+- **Geração Automática**: Relatórios executivos baseados em IA
+- **Análise Inteligente**: Resumo executivo dos dados epidemiológicos
+- **Exportação**: Download em formato TXT para distribuição
+- **Integração**: Preparado para integração com outros sistemas de saúde
+- **Profissional**: Relatórios adequados para autoridades de saúde
 
 ## Problemas Resolvidos
 
@@ -124,3 +132,4 @@ Se encontrar problemas de importação:
 - **Mapas**: OpenStreetMap (gratuito e de alta qualidade)
 - **Visualização**: Heatmaps, gráficos interativos, tooltips
 - **Idioma**: Interface completamente em inglês
+- **IA**: OpenAI API para geração de relatórios executivos

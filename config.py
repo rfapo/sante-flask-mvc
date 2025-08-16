@@ -7,3 +7,5 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
     ALLOWED_EXTENSIONS = {"csv"}
+    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+    OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
