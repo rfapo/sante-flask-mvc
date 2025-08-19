@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kepler.gl Test</title>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { width: 100vw; height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <!-- Kepler.gl Dependencies -->
+    <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/redux@4.2.1/dist/redux.js" crossorigin></script>
+    <script src="https://unpkg.com/react-redux@8.1.2/dist/react-redux.min.js" crossorigin></script>
+    <script src="https://unpkg.com/styled-components@6.1.8/dist/styled-components.min.js" crossorigin></script>
+    
+    <!-- Kepler.gl UMD Bundle -->
+    <script src="https://unpkg.com/kepler.gl@3.1.0/umd/keplergl.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                console.log('React version:', React.version);
+                console.log('Redux version:', Redux.version);
+                console.log('KeplerGl available:', typeof KeplerGl !== 'undefined');
+                
+                if (typeof KeplerGl === 'undefined') {
+                    throw new Error('KeplerGl not loaded');
+                }
+
+                // Create Redux store for Kepler.gl
+                const reducers = Redux.combineReducers({
+                    keplerGl: KeplerGl.keplerGlReducer
+                });
+
+                const middlewares = KeplerGl.enhanceReduxMiddleware([]);
+                const enhancers = Redux.applyMiddleware(...middlewares);
+                const store = Redux.createStore(reducers, {}, Redux.compose(enhancers));
+
+                // Create Kepler.gl component
+                const KeplerElement = React.createElement('div', {
+                    style: {position: 'absolute', left: 0, width: '100%', height: '100%'}
+                }, React.createElement(KeplerGl.KeplerGl, {
+                    id: 'kepler-map',
+                    width: window.innerWidth,
+                    height: window.innerHeight
+                }));
+
+                const app = React.createElement(ReactRedux.Provider, {store}, KeplerElement);
+                
+                const root = ReactDOM.createRoot(document.getElementById('map'));
+                root.render(app);
+                
+                console.log('Kepler.gl initialized successfully');
+            } catch (error) {
+                console.error('Error initializing Kepler.gl:', error);
+                document.getElementById('map').innerHTML = '<div style="padding: 20px; color: red;">Error: ' + error.message + '</div>';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -91,3 +91,170 @@ Requirements:
 Format the report professionally for distribution to health authorities and stakeholders. Keep it concise but comprehensive.
         """
         return prompt.strip()
+    
+    def process_kepler_data(self, raw_data, city, indicator):
+        """Process epidemiological data with OpenAI to enhance it for Kepler.gl visualization"""
+        try:
+            # Prepare data summary for OpenAI
+            data_summary = {
+                'city_name': city.name,
+                'state': city.state,
+                'country': city.country,
+                'rt': indicator.rt,
+                'r0': indicator.r0,
+                'hospitalization_rate': indicator.hospitalization_rate,
+                'data_points': len(raw_data),
+                'coordinate_range': {
+                    'lat_min': min(d['latitude'] for d in raw_data),
+                    'lat_max': max(d['latitude'] for d in raw_data),
+                    'lon_min': min(d['longitude'] for d in raw_data),
+                    'lon_max': max(d['longitude'] for d in raw_data)
+                }
+            }
+            
+            # Create prompt for OpenAI
+            prompt = self._create_kepler_prompt(raw_data, data_summary)
+            
+            # Generate enhanced data with OpenAI
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a data scientist specializing in geospatial data visualization. Your task is to enhance epidemiological data for optimal display in Kepler.gl mapping software."
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                max_tokens=2000,
+                temperature=0.3
+            )
+            
+            # Parse the response and return enhanced data
+            enhanced_data = self._parse_kepler_response(response.choices[0].message.content, raw_data)
+            return enhanced_data, None
+            
+        except Exception as e:
+            return None, f"Error processing data with OpenAI: {str(e)}"
+    
+    def _create_kepler_prompt(self, raw_data, data_summary):
+        """Create a prompt for OpenAI to enhance Kepler.gl data"""
+        prompt = f"""
+You are processing epidemiological data for visualization in Kepler.gl, a powerful geospatial mapping tool.
+
+Current Data Summary:
+- City: {data_summary['city_name']}, {data_summary['state']}, {data_summary['country']}
+- R(t): {data_summary['rt']} (transmission rate)
+- R0: {data_summary['r0']} (basic reproduction number)
+- Hospitalization Rate: {data_summary['hospitalization_rate']}%
+- Data Points: {data_summary['data_points']} weeks
+- Coordinate Range: Lat {data_summary['coordinate_range']['lat_min']:.4f} to {data_summary['coordinate_range']['lat_max']:.4f}, Lon {data_summary['coordinate_range']['lon_min']:.4f} to {data_summary['coordinate_range']['lon_max']:.4f}
+
+Raw Data Sample (first 3 entries):
+{raw_data[:3]}
+
+Your Task:
+Enhance this data for optimal visualization in Kepler.gl by:
+
+1. **Data Validation**: Ensure all coordinates are valid and within reasonable ranges
+2. **Data Enhancement**: Add derived fields that would be useful for mapping:
+   - risk_level: "HIGH" (R(t) > 1.2), "MEDIUM" (R(t) > 1.0), "LOW" (R(t) ≤ 1.0)
+   - case_density: cases per week normalized to a 0-1 scale
+   - trend_indicator: "increasing", "stable", or "decreasing" based on case trends
+   - severity_score: combined score based on R(t), R0, and hospitalization rate
+3. **Geospatial Optimization**: Ensure coordinates are precise and suitable for mapping
+4. **Data Consistency**: Verify all required fields are present and properly formatted
+
+Return the enhanced data as a JSON array with the same structure as the input, plus the new derived fields. Maintain the exact same data types and ensure all coordinates are valid decimal degrees.
+
+Example output format:
+[
+  {{
+    "week": "Week 1",
+    "cases": 150,
+    "city_name": "City Name",
+    "state": "State",
+    "country": "Country",
+    "latitude": 40.7128,
+    "longitude": -74.0060,
+    "rt": 1.15,
+    "r0": 2.5,
+    "hospitalization_rate": 3.2,
+    "risk_level": "MEDIUM",
+    "case_density": 0.75,
+    "trend_indicator": "increasing",
+    "severity_score": 0.68
+  }}
+]
+
+Ensure the response is valid JSON that can be parsed directly.
+        """
+        return prompt.strip()
+    
+    def _parse_kepler_response(self, openai_response, original_data):
+        """Parse OpenAI response and merge with original data"""
+        try:
+            import json
+            
+            # Try to extract JSON from the response
+            response_text = openai_response.strip()
+            
+            # Find JSON array in the response
+            start_idx = response_text.find('[')
+            end_idx = response_text.rfind(']') + 1
+            
+            if start_idx != -1 and end_idx != -1:
+                json_str = response_text[start_idx:end_idx]
+                enhanced_data = json.loads(json_str)
+                
+                # Validate and merge with original data
+                if len(enhanced_data) == len(original_data):
+                    return enhanced_data
+                else:
+                    # If parsing fails, return original data with basic enhancements
+                    return self._enhance_data_basic(original_data)
+            else:
+                # If no JSON found, return original data with basic enhancements
+                return self._enhance_data_basic(original_data)
+                
+        except (json.JSONDecodeError, KeyError, IndexError):
+            # If parsing fails, return original data with basic enhancements
+            return self._enhance_data_basic(original_data)
+    
+    def _enhance_data_basic(self, original_data):
+        """Add basic enhancements to data if OpenAI processing fails"""
+        enhanced_data = []
+        
+        for i, entry in enumerate(original_data):
+            # Calculate basic derived fields
+            risk_level = "HIGH" if entry['rt'] > 1.2 else "MEDIUM" if entry['rt'] > 1.0 else "LOW"
+            
+            # Calculate case density (normalized to 0-1 scale)
+            max_cases = max(d['cases'] for d in original_data)
+            case_density = entry['cases'] / max_cases if max_cases > 0 else 0
+            
+            # Determine trend indicator
+            if i > 0:
+                trend = "increasing" if entry['cases'] > original_data[i-1]['cases'] else "decreasing" if entry['cases'] < original_data[i-1]['cases'] else "stable"
+            else:
+                trend = "stable"
+            
+            # Calculate severity score (0-1 scale)
+            rt_score = min(entry['rt'] / 3.0, 1.0)  # Normalize R(t) to 0-1
+            r0_score = min(entry['r0'] / 5.0, 1.0)  # Normalize R0 to 0-1
+            hosp_score = min(entry['hospitalization_rate'] / 10.0, 1.0)  # Normalize hospitalization to 0-1
+            severity_score = (rt_score + r0_score + hosp_score) / 3
+            
+            enhanced_entry = entry.copy()
+            enhanced_entry.update({
+                'risk_level': risk_level,
+                'case_density': round(case_density, 3),
+                'trend_indicator': trend,
+                'severity_score': round(severity_score, 3)
+            })
+            
+            enhanced_data.append(enhanced_entry)
+        
+        return enhanced_data
