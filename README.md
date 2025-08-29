@@ -1,135 +1,259 @@
-# Santé – Flask MVC (Login, Upload CSV, Dashboard)
+# Santé – Intelligent Epidemiological Surveillance System
 
-Este projeto é um MVP em Flask seguindo o padrão MVC:
-- Autenticação com Flask-Login (usuário: `admin`, senha: `admin`)
-- CRUD mínimo: criação/atualização de uma *Cidade* via upload de CSV
-- Dashboard inspirado no protótipo fornecido (gráfico histórico + previsão ilustrativa)
-- **NEW**: Mapa de risco interativo com OpenStreetMap e heatmap
-- **NEW**: Interface completamente em inglês
+## 🎯 What is Santé?
 
-## Como rodar
+**Santé** is an intelligent epidemiological surveillance system designed to monitor, analyze, and predict disease outbreaks in real-time. Built as a comprehensive web application using Flask MVC architecture, it provides public health officials, epidemiologists, and healthcare administrators with powerful tools for data-driven decision making.
+
+### 🌍 The Challenge
+In today's interconnected world, rapid response to disease outbreaks is crucial. Traditional surveillance methods often involve manual data collection, delayed analysis, and limited predictive capabilities. Public health officials need:
+- **Real-time monitoring** of disease cases across multiple cities
+- **Predictive analytics** to anticipate outbreak trends
+- **Geospatial visualization** to identify risk hotspots
+- **Executive reporting** for stakeholders and decision makers
+- **Data integration** from multiple sources
+
+### 💡 Our Solution
+Santé addresses these challenges through an integrated platform that combines:
+- **Automated Data Processing**: CSV upload and validation for epidemiological data
+- **Intelligent Analytics**: AI-powered calculation of key epidemiological indicators (R(t), R0, hospitalization rates)
+- **Predictive Modeling**: Machine learning-based forecasting of disease trends
+- **Interactive Dashboards**: Real-time visualization of data with actionable insights
+- **Geospatial Intelligence**: Interactive maps with risk assessment and heat mapping
+- **AI-Generated Reports**: Professional executive summaries using OpenAI's GPT models
+- **Multi-City Support**: Comparative analysis across different geographical regions
+
+## 🏗️ Architecture Overview
+
+This project is an MVP built with Flask following the MVC pattern:
+- **Authentication** with Flask-Login (user: `admin`, password: `admin`)
+- **Data Management**: Create/update city data via CSV upload
+- **Dashboard**: Historical data visualization + predictive forecasting
+- **Interactive Risk Maps**: OpenStreetMap integration with heatmap visualization
+- **AI Integration**: OpenAI-powered executive report generation
+- **Modern UI**: Fully responsive interface built with Tailwind CSS
+
+## 🚀 How to Run
 
 ```bash
-# 1. Criar e ativar ambiente virtual
+# 1. Create and activate virtual environment
 python -m venv .venv
-source .venv/bin/activate  # no Windows: .venv\Scripts\activate
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-# 2. Instalar dependências
+# 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Configurar variáveis de ambiente (opcional)
+# 3. Configure environment variables (optional)
 cp env_example .env
-# Edite o arquivo .env se necessário
+# Edit .env file if needed
 
-# 4. Inicializar banco de dados
-export FLASK_APP=main.py  # no Windows: set FLASK_APP=main.py
+# 4. Initialize database
+export FLASK_APP=main.py  # On Windows: set FLASK_APP=main.py
 flask init-db
 
-# 5. Executar aplicação
+# 5. Run application
 python main.py
-# ou
+# or
 flask run
 ```
 
-A aplicação estará disponível em http://localhost:5000
+The application will be available at http://localhost:5000
 
-## Estrutura do Projeto
+## 📁 Project Structure
 
 ```
 sante_flask_mvc/
-├── main.py              # Ponto de entrada principal da aplicação
-├── app.py               # Configuração da aplicação Flask (legado)
-├── wsgi.py              # Ponto de entrada WSGI alternativo
-├── run.py               # Ponto de entrada alternativo
-├── config.py            # Configurações da aplicação
-├── models.py            # Modelos de dados (SQLAlchemy)
-├── controllers/         # Controladores (Blueprints)
-│   ├── auth.py         # Autenticação
-│   ├── cities.py       # Gerenciamento de cidades
-│   └── dashboard.py    # Dashboard de monitoramento
-├── services/            # Serviços de negócio
-│   ├── analytics.py    # Cálculos de indicadores
-│   └── csv_loader.py   # Processamento de CSV
-├── templates/           # Templates HTML
-├── static/              # Arquivos estáticos
-├── env_example          # Exemplo de configurações de ambiente
-└── requirements.txt     # Dependências Python
+├── main.py              # Main application entry point
+├── app.py               # Flask application configuration (legacy)
+├── wsgi.py              # Alternative WSGI entry point
+├── run.py               # Alternative entry point
+├── config.py            # Application configuration
+├── models.py            # Data models (SQLAlchemy)
+├── controllers/         # Controllers (Blueprints)
+│   ├── auth.py         # Authentication
+│   ├── cities.py       # City management
+│   └── dashboard.py    # Monitoring dashboard
+├── services/            # Business logic services
+│   ├── analytics.py    # Indicator calculations
+│   └── csv_loader.py   # CSV processing
+├── templates/           # HTML templates
+├── static/              # Static files
+├── env_example          # Environment configuration example
+└── requirements.txt     # Python dependencies
 ```
 
-## CSV esperado
-Colunas obrigatórias: `city,state,country,week_label,cases`
+## 📊 Expected CSV Format
+Required columns: `city,state,country,week_label,cases`
 
-### Arquivos de Exemplo Disponíveis:
-- **`sample_data.csv`** - Recife, Brazil (dados de exemplo originais)
-- **`new_york_data.csv`** - New York, USA (dados de exemplo)
-- **`freetown_data.csv`** - Freetown, Sierra Leone (dados de exemplo)
+### Available Sample Files:
+- **`sample_data.csv`** - Recife, Brazil (original sample data)
+- **`new_york_data.csv`** - New York, USA (sample data)
+- **`freetown_data.csv`** - Freetown, Sierra Leone (sample data)
 
-Veja a seção "Sample CSV Files" na página de upload para baixar os exemplos.
+See the "Sample CSV Files" section on the upload page to download examples.
 
-## Funcionalidades
+## 🔧 Core Features
 
-- **Login/Logout**: Sistema de autenticação simples
-- **Upload CSV**: Processamento automático de dados epidemiológicos
-- **Dashboard**: Visualização de casos históricos e previsões
-- **Indicadores**: R(t), R0, taxa de internação
-- **Sistema de Alertas**: Baseado no R(t) para tomada de decisão
-- **XAI**: Explicabilidade dos fatores que influenciam as previsões
-- **🌍 Mapa Interativo**: Mapa de risco com OpenStreetMap e heatmap
-- **🌐 Interface em Inglês**: Interface completamente traduzida
-- **🤖 Relatórios Executivos**: Geração automática de relatórios com OpenAI
+### 📈 Epidemiological Intelligence
+- **Real-time Monitoring**: Track disease cases across multiple cities
+- **Predictive Analytics**: AI-powered forecasting of outbreak trends
+- **Risk Assessment**: Dynamic calculation of transmission rates and risk levels
+- **Multi-indicator Analysis**: R(t), R0, hospitalization rates, and trend analysis
 
-## Novas Funcionalidades Implementadas
+### 🗺️ Geospatial Intelligence
+- **Interactive Risk Maps**: OpenStreetMap integration with dynamic heatmaps
+- **Risk Zone Visualization**: Color-coded risk assessment based on epidemiological indicators
+- **Geographic Comparison**: Analyze disease patterns across different regions
+- **Spatial Analytics**: Identify outbreak hotspots and transmission patterns
 
-### 🗺️ Mapa de Risco Interativo
-- **OpenStreetMap**: Mapa base gratuito e de alta qualidade
-- **Heatmap**: Visualização de risco baseada no R(t) com cores dinâmicas
-- **Zonas de Risco**: Múltiplas áreas com diferentes intensidades de risco
-- **Popups Informativos**: Clique nos marcadores para ver detalhes da cidade
-- **Legenda Visual**: Cores codificadas para níveis de risco (Alto/Meio/Baixo)
+### 🤖 AI-Powered Insights
+- **Executive Reports**: Automated generation of professional health reports
+- **Intelligent Analysis**: AI-driven interpretation of epidemiological data
+- **Stakeholder Communication**: Professional reports for health authorities
+- **Predictive Insights**: Machine learning-based trend analysis
 
-### 🌐 Interface em Inglês
-- **Login**: Página de login moderna e responsiva
-- **Upload**: Interface intuitiva para upload de CSV
-- **Dashboard**: Todos os elementos traduzidos para inglês
-- **Navegação**: Menu e navegação em inglês
-- **Mensagens**: Flash messages e feedback em inglês
+### 📱 Modern User Experience
+- **Responsive Design**: Mobile-first interface built with Tailwind CSS
+- **Real-time Updates**: Live dashboard with current data
+- **Interactive Visualizations**: Charts, graphs, and maps for data exploration
+- **Professional Interface**: Clean, intuitive design for healthcare professionals
 
-### 🤖 Relatórios Executivos com OpenAI
-- **Geração Automática**: Relatórios executivos baseados em IA
-- **Análise Inteligente**: Resumo executivo dos dados epidemiológicos
-- **Exportação**: Download em formato TXT para distribuição
-- **Integração**: Preparado para integração com outros sistemas de saúde
-- **Profissional**: Relatórios adequados para autoridades de saúde
+## 🆕 Recently Implemented Features
 
-## Problemas Resolvidos
+### 🗺️ Interactive Risk Mapping
+- **OpenStreetMap Integration**: High-quality, free base maps
+- **Dynamic Heatmaps**: Risk visualization based on R(t) with color-coded intensity
+- **Risk Zones**: Multiple areas with different risk intensity levels
+- **Informative Popups**: Click markers to see detailed city information
+- **Visual Legend**: Color-coded risk levels (High/Medium/Low)
 
-- ✅ **Erro de importação**: Corrigido imports relativos para absolutos
-- ✅ **Estrutura MVC**: Ajustada para funcionar corretamente
-- ✅ **Dashboard**: Atualizado para seguir exatamente o padrão visual do arquivo conceitual
-- ✅ **Execução**: Múltiplos pontos de entrada criados (main.py, wsgi.py, run.py)
-- ✅ **Imports**: Todos os imports agora são absolutos e funcionam corretamente
-- ✅ **Mapa**: Implementado mapa real com OpenStreetMap e heatmap
-- ✅ **Tradução**: Interface completamente em inglês
+### 🌐 English Interface
+- **Professional Design**: Modern, responsive login interface
+- **Intuitive Upload**: User-friendly CSV upload interface
+- **Comprehensive Dashboard**: All elements translated to English
+- **Navigation**: Menu and navigation in English
+- **User Feedback**: Flash messages and notifications in English
 
-## Observações
-- Forecast e indicadores são aproximações ilustrativas (MVP).
-- O mapa de risco usa OpenStreetMap (gratuito) e pode ser expandido com mais cidades.
-- Ajuste a validação e o pipeline de dados conforme a necessidade de produção.
-- O dashboard segue exatamente o padrão visual do arquivo conceitual fornecido.
-- **Login**: admin / admin
+### 🤖 AI Executive Reports
+- **Automated Generation**: AI-powered executive summaries
+- **Intelligent Analysis**: Executive summary of epidemiological data
+- **Export Functionality**: Download in TXT format for distribution
+- **Integration Ready**: Prepared for integration with other health systems
+- **Professional Quality**: Reports suitable for health authorities
 
-## Solução de Problemas
+## ✅ Issues Resolved
 
-Se encontrar problemas de importação:
-1. Use `python main.py` diretamente
-2. Verifique se todas as dependências estão instaladas: `pip install -r requirements.txt`
-3. Certifique-se de que o ambiente virtual está ativado
+- ✅ **Import Errors**: Fixed relative imports to absolute imports
+- ✅ **MVC Structure**: Adjusted to work correctly
+- ✅ **Dashboard**: Updated to follow exact visual pattern from conceptual file
+- ✅ **Execution**: Multiple entry points created (main.py, wsgi.py, run.py)
+- ✅ **Imports**: All imports now absolute and working correctly
+- ✅ **Mapping**: Implemented real map with OpenStreetMap and heatmap
+- ✅ **Translation**: Interface completely in English
 
-## Tecnologias Utilizadas
+## 📋 Use Cases
 
-- **Backend**: Flask, SQLAlchemy, Flask-Login
-- **Frontend**: Tailwind CSS, Chart.js, Leaflet.js
-- **Mapas**: OpenStreetMap (gratuito e de alta qualidade)
-- **Visualização**: Heatmaps, gráficos interativos, tooltips
-- **Idioma**: Interface completamente em inglês
-- **IA**: OpenAI API para geração de relatórios executivos
+### 🏥 Public Health Officials
+- Monitor disease outbreaks across multiple cities
+- Generate executive reports for stakeholders
+- Analyze transmission patterns and risk factors
+- Make data-driven decisions for public health interventions
+
+### 🔬 Epidemiologists
+- Track disease progression over time
+- Analyze transmission rates and reproduction numbers
+- Identify outbreak hotspots and risk zones
+- Generate professional reports for publication
+
+### 🏛️ Government Agencies
+- Real-time surveillance of public health threats
+- Evidence-based policy making
+- Resource allocation based on risk assessment
+- Communication with international health organizations
+
+### 🏢 Healthcare Organizations
+- Monitor local disease patterns
+- Prepare for potential outbreaks
+- Coordinate with public health authorities
+- Track resource utilization and capacity planning
+
+## 🚀 Technology Stack
+
+### Backend
+- **Framework**: Flask 3.0.3 - Lightweight, flexible Python web framework
+- **Database**: SQLAlchemy 2.0.23 - Modern Python ORM with type safety
+- **Authentication**: Flask-Login 0.6.3 - Secure user session management
+- **Data Processing**: Pandas 2.2.2 - Powerful data manipulation and analysis
+
+### Frontend
+- **CSS Framework**: Tailwind CSS - Utility-first CSS framework for rapid UI development
+- **Charts**: Chart.js - Interactive JavaScript charts and graphs
+- **Maps**: Leaflet.js + OpenStreetMap - Free, high-quality mapping solution
+- **Advanced Visualization**: Kepler.gl - Uber's geospatial analysis platform
+
+### AI & Intelligence
+- **Language Models**: OpenAI GPT-4o-mini - Advanced AI for report generation
+- **Predictive Analytics**: Custom algorithms for epidemiological forecasting
+- **Risk Assessment**: Dynamic calculation of transmission rates and risk levels
+
+### Infrastructure
+- **Development**: Flask development server with hot reload
+- **Production Ready**: WSGI-compatible for production deployment
+- **Database**: SQLite for development, PostgreSQL ready for production
+- **Environment**: Flexible configuration via environment variables
+
+## 🔮 Future Roadmap
+
+### Phase 2: Advanced Analytics
+- **Machine Learning Models**: Enhanced predictive algorithms
+- **Real-time Data Feeds**: Integration with health APIs
+- **Advanced Geospatial**: 3D visualization and spatial analysis
+- **Mobile Applications**: Native mobile apps for field workers
+
+### Phase 3: Enterprise Features
+- **Multi-tenant Architecture**: Support for multiple organizations
+- **Advanced Security**: Role-based access control and audit logging
+- **API Integration**: RESTful APIs for third-party integrations
+- **Scalability**: Microservices architecture and load balancing
+
+### Phase 4: Global Scale
+- **International Support**: Multi-language and multi-currency
+- **Global Data Sources**: Integration with WHO and CDC data
+- **Collaborative Features**: Cross-organization data sharing
+- **Advanced Reporting**: Custom report builders and dashboards
+
+## 📚 Documentation
+
+- **Complete Documentation**: See `DOCUMENTACAO_COMPLETA.md` for comprehensive technical details
+- **OpenAI Setup**: See `OPENAI_SETUP.md` for AI integration configuration
+- **Map Features**: See `MAP_FEATURES.md` for geospatial functionality details
+- **Demo Guide**: See `DEMO_GUIDE.md` for demonstration instructions
+- **Dispatch Reports**: See `DISPATCH_REPORT_FEATURES.md` for AI report generation
+
+## 🤝 Contributing
+
+This project is designed as an MVP for demonstration and educational purposes. Contributions are welcome for:
+- Bug fixes and improvements
+- New features and enhancements
+- Documentation improvements
+- Testing and quality assurance
+
+## 📄 License
+
+This project is provided as-is for educational and demonstration purposes. The data used is fictional and for demonstration only.
+
+## 🆘 Support
+
+For technical issues:
+1. Use `python main.py` directly
+2. Verify all dependencies are installed: `pip install -r requirements.txt`
+3. Ensure virtual environment is activated
+4. Check logs for detailed error information
+
+## 🔑 Default Access
+
+- **Username**: `admin`
+- **Password**: `admin`
+
+---
+
+*Santé - Transforming Public Health Surveillance Through Intelligent Technology*
