@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit User' if user else 'New User' }} - Santé Admin{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+  <h1 class="text-3xl font-bold mb-2">{{ 'Edit User' if user else 'Create New User' }}</h1>
+  <p class="text-gray-400">{{ 'Update user information' if user else 'Add a new user to the system' }}</p>
+</div>
+
+<div class="card max-w-lg">
+  <form method="POST">
+    <div class="mb-4">
+      <label for="username" class="block text-sm font-medium mb-2">Username *</label>
+      <input type="text" id="username" name="username" value="{{ user.username if user else '' }}" required
+             class="w-full px-3 py-2 bg-black border border-gray-600 rounded focus:outline-none focus:border-white">
+    </div>
+
+    <div class="mb-4">
+      <label for="email" class="block text-sm font-medium mb-2">Email</label>
+      <input type="email" id="email" name="email" value="{{ user.email if user and user.email else '' }}"
+             class="w-full px-3 py-2 bg-black border border-gray-600 rounded focus:outline-none focus:border-white">
+    </div>
+
+    <div class="mb-4">
+      <label for="password" class="block text-sm font-medium mb-2">Password {{ '*' if not user else '(leave blank to keep current)' }}</label>
+      <input type="password" id="password" name="password" {{ 'required' if not user else '' }}
+             class="w-full px-3 py-2 bg-black border border-gray-600 rounded focus:outline-none focus:border-white">
+    </div>
+
+    <div class="mb-6">
+      <label class="flex items-center">
+        <input type="checkbox" name="is_admin" {{ 'checked' if user and user.is_admin else '' }}
+               class="mr-2 w-4 h-4">
+        <span class="text-sm">Administrator privileges</span>
+      </label>
+    </div>
+
+    <div class="flex gap-4">
+      <button type="submit" class="button">{{ 'Update User' if user else 'Create User' }}</button>
+      <a href="{{ url_for('admin.users_list') }}" class="text-gray-400 hover:text-white py-3">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

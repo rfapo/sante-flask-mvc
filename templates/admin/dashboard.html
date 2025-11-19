@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - Santé{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+  <h1 class="text-3xl font-bold mb-2">Admin Dashboard</h1>
+  <p class="text-gray-400">System administration and configuration</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <div class="card">
+    <h3 class="text-lg font-semibold mb-2">Users</h3>
+    <p class="text-3xl font-bold">{{ users_count }}</p>
+    <a href="{{ url_for('admin.users_list') }}" class="text-sm text-gray-400 hover:text-white">Manage users</a>
+  </div>
+
+  <div class="card">
+    <h3 class="text-lg font-semibold mb-2">Cities</h3>
+    <p class="text-3xl font-bold">{{ cities_count }}</p>
+    <a href="{{ url_for('admin.cities_list') }}" class="text-sm text-gray-400 hover:text-white">Manage cities</a>
+  </div>
+
+  <div class="card">
+    <h3 class="text-lg font-semibold mb-2">OpenAI API</h3>
+    <p class="text-3xl font-bold">{{ 'Configured' if has_openai else 'Not Set' }}</p>
+    <a href="{{ url_for('admin.settings') }}" class="text-sm text-gray-400 hover:text-white">Configure</a>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <a href="{{ url_for('admin.users_list') }}" class="card block">
+    <h3 class="text-xl font-semibold mb-2">User Management</h3>
+    <p class="text-gray-400">Create, edit, and delete user accounts</p>
+  </a>
+
+  <a href="{{ url_for('admin.cities_list') }}" class="card block">
+    <h3 class="text-xl font-semibold mb-2">City Management</h3>
+    <p class="text-gray-400">View and remove cities from the system</p>
+  </a>
+
+  <a href="{{ url_for('admin.settings') }}" class="card block">
+    <h3 class="text-xl font-semibold mb-2">Settings</h3>
+    <p class="text-gray-400">Configure OpenAI API key and other settings</p>
+  </a>
+
+  <a href="{{ url_for('home') }}" class="card block">
+    <h3 class="text-xl font-semibold mb-2">Back to App</h3>
+    <p class="text-gray-400">Return to the main application</p>
+  </a>
+</div>
+{% endblock %}

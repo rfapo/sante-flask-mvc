@@ -83,6 +83,9 @@
       <div class="space-x-6">
         <a class="text-sm text-text-light hover:text-border-subtle font-medium transition-colors" href="{{ url_for('cities.list_cities') }}">Cities</a>
         <a class="text-sm text-text-light hover:text-border-subtle font-medium transition-colors" href="{{ url_for('cities.upload') }}">Upload CSV</a>
+        {% if current_user.is_authenticated and current_user.is_admin %}
+        <a class="text-sm text-text-light hover:text-border-subtle font-medium transition-colors" href="{{ url_for('admin.dashboard') }}">Admin</a>
+        {% endif %}
         <a class="text-sm text-text-light hover:text-border-subtle font-medium transition-colors" href="{{ url_for('auth.logout') }}">Logout</a>
       </div>
     </div>

@@ -365,28 +365,55 @@ document.addEventListener('DOMContentLoaded', function () {
   function loadDataIntoKepler(cityData) {
     try {
       console.log('Loading data into Kepler.gl...');
-      
-      // Convert data to Kepler.gl format
+
+      // Define fields for Kepler.gl
+      const fields = [
+        {name: 'week', format: '', type: 'string'},
+        {name: 'cases', format: '', type: 'integer'},
+        {name: 'city_name', format: '', type: 'string'},
+        {name: 'state', format: '', type: 'string'},
+        {name: 'country', format: '', type: 'string'},
+        {name: 'latitude', format: '', type: 'real'},
+        {name: 'longitude', format: '', type: 'real'},
+        {name: 'rt', format: '', type: 'real'},
+        {name: 'r0', format: '', type: 'real'},
+        {name: 'hospitalization_rate', format: '', type: 'real'},
+        {name: 'risk_level', format: '', type: 'string'},
+        {name: 'case_density', format: '', type: 'real'},
+        {name: 'severity_score', format: '', type: 'real'}
+      ];
+
+      // Convert array of objects to rows format
+      const rows = cityData.map(item => [
+        item.week || item.week_label || '',
+        item.cases || 0,
+        item.city_name || '',
+        item.state || '',
+        item.country || '',
+        item.latitude || 0,
+        item.longitude || 0,
+        item.rt || 0,
+        item.r0 || 0,
+        item.hospitalization_rate || 0,
+        item.risk_level || 'Unknown',
+        item.case_density || 0,
+        item.severity_score || 0
+      ]);
+
+      console.log('Converted to rows format:', rows);
+
+      // Create dataset in Kepler.gl expected format
       const keplerDataset = {
-        data: cityData,
         info: {
           id: 'city-epidemiological-data',
-          label: 'City Epidemiological Data',
-          columns: [
-            {name: 'week', type: 'string'},
-            {name: 'cases', type: 'integer'},
-            {name: 'city_name', type: 'string'},
-            {name: 'state', type: 'string'},
-            {name: 'country', type: 'string'},
-            {name: 'latitude', type: 'real'},
-            {name: 'longitude', type: 'real'},
-            {name: 'rt', type: 'real'},
-            {name: 'r0', type: 'real'},
-            {name: 'hospitalization_rate', type: 'real'}
-          ]
+          label: '{{ city.name }} Epidemiological Data'
+        },
+        data: {
+          fields: fields,
+          rows: rows
         }
       };
-      
+
       // Try to load data into Kepler.gl
       if (keplerStore && typeof KeplerGl.addDataToMap !== 'undefined') {
         keplerStore.dispatch(KeplerGl.addDataToMap({
@@ -410,7 +437,7 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('Kepler.gl data loading APIs not available');
         showDataOverlay(cityData);
       }
-      
+
     } catch (error) {
       console.error('Error loading data into Kepler.gl:', error);
       showDataOverlay(cityData);
