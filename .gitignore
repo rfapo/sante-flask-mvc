@@ -67,3 +67,14 @@ uploads/
 # Temporary files
 *.tmp
 *.temp
+
+# Test files in root
+test_*.py
+test_*.html
+
+# Socket files
+*.sock
+
+# Sensitive
+secrets.py
+credentials.py
