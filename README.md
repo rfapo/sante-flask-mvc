@@ -1,5 +1,8 @@
 # Santé – Intelligent Epidemiological Surveillance System
 
+> ⚠️ **SECURITY WARNING**: This application includes default development credentials (`admin`/`admin`).
+> **NEVER use these credentials in production**. See the [Security](#-security) section below for proper setup.
+
 ## 🎯 What is Santé?
 
 **Santé** is an intelligent epidemiological surveillance system designed to monitor, analyze, and predict disease outbreaks in real-time. Built as a comprehensive web application using Flask MVC architecture, it provides public health officials, epidemiologists, and healthcare administrators with powerful tools for data-driven decision making.
@@ -25,7 +28,9 @@ Santé addresses these challenges through an integrated platform that combines:
 ## 🏗️ Architecture Overview
 
 This project is an MVP built with Flask following the MVC pattern:
-- **Authentication** with Flask-Login (user: `admin`, password: `admin`)
+- **Authentication** with Flask-Login and role-based access control
+  - ⚠️ Default dev credentials: user: `admin`, password: `admin` (**DEVELOPMENT ONLY**)
+  - Admin panel at `/admin` for user management and settings
 - **Data Management**: Create/update city data via CSV upload
 - **Dashboard**: Historical data visualization + predictive forecasting
 - **Interactive Risk Maps**: OpenStreetMap integration with heatmap visualization
@@ -42,16 +47,22 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 # 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Configure environment variables (optional)
-cp env_example .env
-# Edit .env file if needed
+# 3. Configure environment variables
+cp .env.example .env
+# Edit .env file with your configuration:
+# - Set a strong SECRET_KEY (generate with: openssl rand -hex 32)
+# - Add your OPENAI_API_KEY for AI report generation
+# - Add your MAPBOX_TOKEN for Kepler.gl maps (optional)
 
-# 4. Initialize database
-export FLASK_APP=main.py  # On Windows: set FLASK_APP=main.py
+# 4. Initialize database and create admin user
+export FLASK_APP=app.py  # On Windows: set FLASK_APP=app.py
 flask init-db
+flask create-root  # Follow prompts to create your admin account
 
 # 5. Run application
-python main.py
+python app.py
+# or
+python wsgi.py
 # or
 flask run
 ```
@@ -62,34 +73,45 @@ The application will be available at http://localhost:5000
 
 ```
 sante_flask_mvc/
-├── main.py              # Main application entry point
-├── app.py               # Flask application configuration (legacy)
-├── wsgi.py              # Alternative WSGI entry point
-├── run.py               # Alternative entry point
+├── app.py                # Flask application factory and CLI commands
+├── wsgi.py              # WSGI entry point for production deployment
 ├── config.py            # Application configuration
 ├── models.py            # Data models (SQLAlchemy)
 ├── controllers/         # Controllers (Blueprints)
 │   ├── auth.py         # Authentication
 │   ├── cities.py       # City management
-│   └── dashboard.py    # Monitoring dashboard
+│   ├── dashboard.py    # Monitoring dashboard
+│   └── admin.py        # Admin panel
 ├── services/            # Business logic services
 │   ├── analytics.py    # Indicator calculations
 │   └── csv_loader.py   # CSV processing
-├── templates/           # HTML templates
-├── static/              # Static files
-├── env_example          # Environment configuration example
-└── requirements.txt     # Python dependencies
+├── templates/           # HTML templates (Jinja2)
+├── static/              # Static files (CSS, JS, images)
+├── data/                # Data directory
+│   └── samples/        # Sample CSV files for testing
+├── docs/                # Documentation
+│   ├── COMPLETE_DOCUMENTATION.md
+│   ├── DEMO_GUIDE.md
+│   ├── DISPATCH_REPORT_FEATURES.md
+│   ├── MAP_FEATURES.md
+│   ├── OPENAI_SETUP.md
+│   └── SECURITY.md
+├── tests/               # Test suite
+├── .env.example         # Environment configuration template
+├── requirements.txt     # Python dependencies
+└── README.md            # This file
 ```
 
 ## 📊 Expected CSV Format
 Required columns: `city,state,country,week_label,cases`
 
 ### Available Sample Files:
+Sample files are located in `data/samples/`:
 - **`sample_data.csv`** - Recife, Brazil (original sample data)
 - **`new_york_data.csv`** - New York, USA (sample data)
 - **`freetown_data.csv`** - Freetown, Sierra Leone (sample data)
 
-See the "Sample CSV Files" section on the upload page to download examples.
+You can also download examples from the "Sample CSV Files" section on the upload page.
 
 ## 🔧 Core Features
 
@@ -145,9 +167,12 @@ See the "Sample CSV Files" section on the upload page to download examples.
 - ✅ **Import Errors**: Fixed relative imports to absolute imports
 - ✅ **MVC Structure**: Adjusted to work correctly
 - ✅ **Dashboard**: Updated to follow exact visual pattern from conceptual file
-- ✅ **Execution**: Multiple entry points created (main.py, wsgi.py, run.py)
+- ✅ **Admin Panel**: Full user management and settings configuration at `/admin`
+- ✅ **Security**: Hardcoded credentials removed, environment variable configuration
+- ✅ **Project Organization**: Docs moved to `docs/`, sample data to `data/samples/`
 - ✅ **Imports**: All imports now absolute and working correctly
 - ✅ **Mapping**: Implemented real map with OpenStreetMap and heatmap
+- ✅ **Kepler.gl Integration**: Advanced geospatial visualization
 - ✅ **Translation**: Interface completely in English
 
 ## 📋 Use Cases
@@ -223,11 +248,14 @@ See the "Sample CSV Files" section on the upload page to download examples.
 
 ## 📚 Documentation
 
-- **Complete Documentation**: See `DOCUMENTACAO_COMPLETA.md` for comprehensive technical details
-- **OpenAI Setup**: See `OPENAI_SETUP.md` for AI integration configuration
-- **Map Features**: See `MAP_FEATURES.md` for geospatial functionality details
-- **Demo Guide**: See `DEMO_GUIDE.md` for demonstration instructions
-- **Dispatch Reports**: See `DISPATCH_REPORT_FEATURES.md` for AI report generation
+All documentation is located in the `docs/` directory:
+
+- **[Complete Documentation](docs/COMPLETE_DOCUMENTATION.md)** - Comprehensive technical details
+- **[Security Guidelines](docs/SECURITY.md)** - Security best practices and configuration
+- **[OpenAI Setup](docs/OPENAI_SETUP.md)** - AI integration configuration
+- **[Map Features](docs/MAP_FEATURES.md)** - Geospatial functionality details
+- **[Demo Guide](docs/DEMO_GUIDE.md)** - Demonstration instructions
+- **[Dispatch Reports](docs/DISPATCH_REPORT_FEATURES.md)** - AI report generation
 
 ## 🤝 Contributing
 
@@ -241,18 +269,53 @@ This project is designed as an MVP for demonstration and educational purposes. C
 
 This project is provided as-is for educational and demonstration purposes. The data used is fictional and for demonstration only.
 
+## 🔒 Security
+
+**IMPORTANT**: Please read the [Security Guidelines](docs/SECURITY.md) before deploying to production.
+
+### Quick Security Checklist
+
+- ✅ Change default admin credentials immediately
+- ✅ Set a strong `SECRET_KEY` in environment variables (use `openssl rand -hex 32`)
+- ✅ Never commit `.env` files or database files to version control
+- ✅ Use HTTPS in production (SSL/TLS certificates)
+- ✅ Keep dependencies updated (`pip list --outdated`)
+- ✅ Review firewall rules and access controls
+- ✅ Set up regular database backups
+
+### Environment Variables
+
+Required for production:
+- `SECRET_KEY` - Strong random key for session encryption
+- `ROOT_ADMIN_EMAIL` - Your admin email address
+- `OPENAI_API_KEY` - For AI report generation (optional but recommended)
+- `MAPBOX_TOKEN` - For Kepler.gl maps (optional)
+
+See `.env.example` for complete configuration template.
+
 ## 🆘 Support
 
 For technical issues:
-1. Use `python main.py` directly
+1. Use `python app.py` or `python wsgi.py` to run the application
 2. Verify all dependencies are installed: `pip install -r requirements.txt`
 3. Ensure virtual environment is activated
-4. Check logs for detailed error information
+4. Check environment variables are configured correctly
+5. Check logs for detailed error information
+6. Review [Security Guidelines](docs/SECURITY.md) for security-related issues
 
-## 🔑 Default Access
+## 🔑 Development Access
 
+⚠️ **DEVELOPMENT ONLY - NOT FOR PRODUCTION**
+
+Default test credentials (if not using `flask create-root`):
 - **Username**: `admin`
 - **Password**: `admin`
+
+**For production**: Always create a secure admin account using:
+```bash
+flask create-root
+```
+This will prompt you to create an admin account with your email and a strong password.
 
 ---
 

@@ -42,6 +42,7 @@ env/
 *.swp
 *.swo
 *~
+*.code-workspace
 
 # OS
 .DS_Store
@@ -71,6 +72,9 @@ uploads/
 # Test files in root
 test_*.py
 test_*.html
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Socket files
 *.sock
