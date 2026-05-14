@@ -8,6 +8,7 @@ from controllers.auth import auth_bp
 from controllers.cities import cities_bp
 from controllers.dashboard import dashboard_bp
 from controllers.admin import admin_bp
+from controllers.hantawatch import hantawatch_bp
 
 def create_app():
     app = Flask(__name__)
@@ -29,6 +30,10 @@ def create_app():
     app.register_blueprint(cities_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(admin_bp)
+    # Hantawatch subdomain (public static site at hantawatch.<SERVER_NAME>).
+    # Only active when SERVER_NAME is set in config (production); skipped in dev.
+    if app.config.get("SERVER_NAME"):
+        app.register_blueprint(hantawatch_bp)
 
     # Routes
     @app.route("/")

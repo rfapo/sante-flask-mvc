@@ -21,4 +21,14 @@ class Config:
 
     # Mapbox Configuration (for Kepler.gl maps)
     # Get your token at: https://account.mapbox.com/access-tokens/
-    MAPBOX_TOKEN = os.environ.get("MAPBOX_TOKEN", "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw")
+    # NOTE: hard-coded fallback removed 2026-05-14 because GitHub push-protection
+    # flags any pk.* token. Set MAPBOX_TOKEN env var (or put it in .env / .env.example)
+    # for the Kepler maps to render. Without the token, maps still work but with
+    # the default light tiles only.
+    MAPBOX_TOKEN = os.environ.get("MAPBOX_TOKEN", "")
+
+    # Subdomain matching — required for the hantawatch blueprint.
+    # Production: SERVER_NAME=santehealth.co (blueprint registers + responds to hantawatch.santehealth.co).
+    # Dev: leave SERVER_NAME unset (blueprint is skipped in app.py so `flask run` works on http://localhost:5000 as before).
+    SERVER_NAME = os.environ.get("SERVER_NAME")
+    SUBDOMAIN_MATCHING = bool(SERVER_NAME)

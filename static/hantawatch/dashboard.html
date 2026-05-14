@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HantaWatch · Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="assets/css/dashboard.css"/>
+</head>
+<body class="dash">
+
+<!-- ── SIDEBAR ─────────────────────────────────────── -->
+<aside id="sidebar">
+  <div class="sb-top">
+    <a href="index.html" class="sb-brand">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="10" cy="10" r="2.5" fill="currentColor"/>
+        <line x1="10" y1="1.5" x2="10" y2="5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="10" y1="14.5" x2="10" y2="18.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="1.5" y1="10" x2="5.5" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="14.5" y1="10" x2="18.5" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span>HantaWatch <span style="font-weight:400;opacity:.4;font-size:.78em;">by Santé</span></span>
+    </a>
+    <span class="sb-live">
+      <span class="live-dot"></span>LIVE
+    </span>
+  </div>
+
+  <nav class="sb-nav" aria-label="Dashboard sections">
+    <a class="sb-link active" data-section="overview" href="#overview">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      Overview
+    </a>
+    <a class="sb-link" data-section="linelist" href="#linelist">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+      Line List
+    </a>
+    <a class="sb-link" data-section="map" href="#map">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+      Geography
+    </a>
+    <a class="sb-link" data-section="news" href="#news">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/><line x1="16" y1="10" x2="10" y2="10"/><line x1="13" y1="14" x2="10" y2="14"/><rect x="10" y="5" width="6" height="4" rx="1"/></svg>
+      News
+    </a>
+    <a class="sb-link" data-section="sequences" href="#sequences">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M8 3c0 4.5 8 4.5 8 9s-8 4.5-8 9"/><path d="M16 3c0 4.5-8 4.5-8 9s8 4.5 8 9"/><line x1="6.5" y1="7.5" x2="17.5" y2="7.5"/><line x1="6.5" y1="16.5" x2="17.5" y2="16.5"/></svg>
+      Sequences
+    </a>
+  </nav>
+
+  <div class="sb-foot">
+    <div class="sb-sync">
+      <span class="sync-dot"></span>
+      <span id="sbDate">—</span>
+    </div>
+    <a href="https://github.com/kraemer-lab/Hondius_hantavirus_h2026" target="_blank" rel="noopener" class="sb-cite">
+      Global.health · CC BY 4.0
+    </a>
+  </div>
+</aside>
+
+<!-- ── MAIN ────────────────────────────────────────── -->
+<main id="main">
+
+  <!-- Data unavailability banner (hidden until fetch fails) -->
+  <div id="dataBanner" class="data-banner" hidden>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span class="db-msg"></span>
+    <a class="db-src" href="https://github.com/kraemer-lab/Hondius_hantavirus_h2026/tree/main/data/linelist" target="_blank" rel="noopener">Check source</a>
+    <button class="db-close" aria-label="Dismiss" onclick="this.closest('.data-banner').hidden=true">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <!-- Top bar -->
+  <header id="topbar">
+    <div class="tb-left">
+      <button id="sbToggle" class="icon-btn" aria-label="Toggle sidebar">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div>
+        <span class="tb-title" id="tbTitle">Overview</span>
+        <span class="tb-sub">Hondius Hantavirus 2026 · Andes Virus (ANDV)</span>
+      </div>
+    </div>
+    <div class="tb-right">
+      <!-- KPI strip: numbers separated by dividers, no card boxes -->
+      <div class="kpi-strip">
+        <div class="kpi-item">
+          <span class="kpi-val" id="kCases">—</span>
+          <span class="kpi-lab">Cases</span>
+        </div>
+        <span class="kpi-sep" aria-hidden="true"></span>
+        <div class="kpi-item">
+          <span class="kpi-val kpi-red" id="kDeaths">—</span>
+          <span class="kpi-lab">Deaths</span>
+        </div>
+        <span class="kpi-sep" aria-hidden="true"></span>
+        <div class="kpi-item">
+          <span class="kpi-val" id="kCountries">—</span>
+          <span class="kpi-lab">Nationalities</span>
+        </div>
+      </div>
+      <a href="index.html" class="icon-btn" aria-label="Home">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- Loading bar -->
+  <div id="loadBar" role="progressbar" aria-valuenow="0"><div id="loadFill"></div></div>
+
+  <!-- ── OVERVIEW ──────────────────────────────────── -->
+  <section id="overview" class="panel active">
+
+    <!-- Editorial KPI row: large numbers, no card shells -->
+    <div class="overview-kpis">
+      <div class="ov-kpi">
+        <span class="ov-num" id="ovCases">—</span>
+        <span class="ov-lbl">Confirmed &amp; Suspected</span>
+        <span class="ov-sub">Total line-list entries</span>
+      </div>
+      <div class="ov-kpi ov-kpi--red">
+        <span class="ov-num" id="ovDeaths">—</span>
+        <span class="ov-lbl">Fatalities</span>
+        <span class="ov-sub" id="ovCFR">CFR: —</span>
+      </div>
+      <div class="ov-kpi">
+        <span class="ov-num" id="ovConfirmed">—</span>
+        <span class="ov-lbl">Lab Confirmed</span>
+        <span class="ov-sub">With confirmation date</span>
+      </div>
+      <div class="ov-kpi">
+        <span class="ov-num" id="ovNat">—</span>
+        <span class="ov-lbl">Nationalities</span>
+        <span class="ov-sub">Distinct in line list</span>
+      </div>
+    </div>
+
+    <!-- Bento chart grid: asymmetric columns -->
+    <div class="bento">
+      <!-- Row 1: timeline (2fr) + status (1fr) -->
+      <div class="bento-card bento-timeline">
+        <div class="bc-head">
+          <span class="bc-title">Cases over time</span>
+          <span class="bc-sub">Symptom onset · new &amp; cumulative</span>
+        </div>
+        <div class="bc-body"><canvas id="chartTimeline"></canvas></div>
+      </div>
+      <div class="bento-card bento-status">
+        <div class="bc-head"><span class="bc-title">Status</span></div>
+        <div class="bc-body"><canvas id="chartStatus"></canvas></div>
+      </div>
+
+      <!-- Row 2: sex (1fr) + outcome (1fr) + nationality bar (2fr) -->
+      <div class="bento-card bento-sex">
+        <div class="bc-head"><span class="bc-title">Sex</span></div>
+        <div class="bc-body"><canvas id="chartSex"></canvas></div>
+      </div>
+      <div class="bento-card bento-outcome">
+        <div class="bc-head"><span class="bc-title">Outcomes</span></div>
+        <div class="bc-body"><canvas id="chartOutcome"></canvas></div>
+      </div>
+      <div class="bento-card bento-nat">
+        <div class="bc-head">
+          <span class="bc-title">Nationality breakdown</span>
+          <span class="bc-sub">Cases per nationality</span>
+        </div>
+        <div class="bc-body"><canvas id="chartNat"></canvas></div>
+      </div>
+
+      <!-- Row 3: crew (1fr) standalone -->
+      <div class="bento-card bento-crew">
+        <div class="bc-head"><span class="bc-title">Crew vs Passengers</span></div>
+        <div class="bc-body"><canvas id="chartCrew"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── LINE LIST ─────────────────────────────────── -->
+  <section id="linelist" class="panel">
+    <div class="toolbar">
+      <label class="search-box" for="listSearch">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="listSearch" type="search" placeholder="Search by nationality, status…" autocomplete="off"/>
+      </label>
+      <select id="fStatus" class="sel">
+        <option value="">All status</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="probable">Probable</option>
+        <option value="negative">Negative</option>
+        <option value="monitored">Monitored</option>
+      </select>
+      <select id="fOutcome" class="sel">
+        <option value="">All outcomes</option>
+        <option value="alive">Alive</option>
+        <option value="deceased">Deceased</option>
+      </select>
+      <span class="tb-count" id="listCount">— cases</span>
+    </div>
+    <div class="tbl-wrap">
+      <table id="caseTable">
+        <thead>
+          <tr>
+            <th>ID</th><th>Status</th><th>Onset</th><th>Age</th><th>Sex</th>
+            <th>Nationality</th><th>Outcome</th><th>Role</th><th>Travel from</th><th>Confirmed</th>
+          </tr>
+        </thead>
+        <tbody id="caseBody">
+          <tr><td colspan="10" class="tbl-loading">
+            <span class="sk-line" style="width:180px"></span>
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── GEOGRAPHY ─────────────────────────────────── -->
+  <section id="map" class="panel panel-map">
+    <div id="leafletMap"></div>
+    <div class="map-panel">
+      <h3 class="map-title">Geographic spread</h3>
+      <p class="map-desc">Cases plotted by nationality and last known location. ANDV outbreak originating from the MV Hondius vessel.</p>
+      <div class="map-legend">
+        <div class="leg-row"><span class="leg-dot ld-red"></span>Fatality</div>
+        <div class="leg-row"><span class="leg-dot ld-teal"></span>Confirmed</div>
+        <div class="leg-row"><span class="leg-dot ld-grey"></span>Suspected / other</div>
+      </div>
+      <div id="countryList" class="country-list"></div>
+    </div>
+  </section>
+
+  <!-- ── NEWS ─────────────────────────────────────── -->
+  <section id="news" class="panel">
+    <div class="toolbar">
+      <label class="search-box" for="newsSearch">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="newsSearch" type="search" placeholder="Search articles…" autocomplete="off"/>
+      </label>
+      <select id="newsLang" class="sel">
+        <option value="">All languages</option>
+        <option value="en">English</option>
+      </select>
+      <select id="newsSort" class="sel">
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+      </select>
+      <span class="tb-count" id="newsCount">— articles</span>
+    </div>
+    <div id="newsFeed" class="news-feed">
+      <div class="sk-news-grid">
+        <div class="sk-news-card"><div class="sk-line" style="width:60%"></div><div class="sk-line" style="width:90%;margin-top:.5rem"></div><div class="sk-line" style="width:75%;margin-top:.3rem"></div></div>
+        <div class="sk-news-card"><div class="sk-line" style="width:55%"></div><div class="sk-line" style="width:85%;margin-top:.5rem"></div><div class="sk-line" style="width:70%;margin-top:.3rem"></div></div>
+        <div class="sk-news-card"><div class="sk-line" style="width:65%"></div><div class="sk-line" style="width:88%;margin-top:.5rem"></div><div class="sk-line" style="width:60%;margin-top:.3rem"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SEQUENCES ─────────────────────────────────── -->
+  <section id="sequences" class="panel">
+    <div class="seq-wrap">
+
+      <div class="seq-hero-card">
+        <span class="seq-tag">ANDV · Hantaviridae</span>
+        <h2 class="seq-title">Genome Sequence</h2>
+        <p class="seq-desc">
+          Andes virus sequence data from the Swiss National Reference Center for Emerging Viruses.
+          Supports global phylogenetic analysis and outbreak linkage confirmation.
+        </p>
+        <dl class="seq-dl">
+          <div class="seq-dl-row">
+            <dt>Accession</dt>
+            <dd class="mono">ANDV-Switzerland-Hu-3337-2026</dd>
+          </div>
+          <div class="seq-dl-row">
+            <dt>Source</dt>
+            <dd>Swiss National Reference Center for Emerging Viruses</dd>
+          </div>
+          <div class="seq-dl-row">
+            <dt>Format</dt>
+            <dd class="mono">FASTA (.fasta.gz)</dd>
+          </div>
+          <div class="seq-dl-row">
+            <dt>Virus</dt>
+            <dd>Andes virus (ANDV)</dd>
+          </div>
+          <div class="seq-dl-row">
+            <dt>Host</dt>
+            <dd>Human — imported case, Switzerland</dd>
+          </div>
+          <div class="seq-dl-row">
+            <dt>Year</dt>
+            <dd class="mono">2026</dd>
+          </div>
+        </dl>
+        <a href="https://github.com/kraemer-lab/Hondius_hantavirus_h2026/tree/main/data/sequences" target="_blank" rel="noopener" class="seq-dl-btn">
+          Download FASTA
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <div class="seq-info">
+        <div class="seq-grid">
+          <div class="seq-card">
+            <span class="seq-card-label">Transmission</span>
+            <p>ANDV is the only hantavirus with documented person-to-person transmission, typically via respiratory secretions from infected individuals.</p>
+          </div>
+          <div class="seq-card">
+            <span class="seq-card-label">Genome architecture</span>
+            <p>Tripartite negative-sense RNA genome (S, M, L segments). Encodes nucleoprotein, glycoproteins Gn/Gc, and RNA-dependent RNA polymerase.</p>
+          </div>
+          <div class="seq-card">
+            <span class="seq-card-label">Clinical presentation</span>
+            <p>Hantavirus Pulmonary Syndrome (HPS). Fever, myalgia, and headache progressing to acute respiratory distress. CFR ~15–35%.</p>
+          </div>
+          <div class="seq-card">
+            <span class="seq-card-label">Why sequencing matters</span>
+            <p>Phylogenetic placement confirms outbreak linkage, identifies transmission clusters, and supports public health response and contact tracing.</p>
+          </div>
+        </div>
+
+        <div class="seq-links">
+          <span class="seq-links-label">Look up sequence</span>
+          <div class="seq-link-row">
+            <a href="https://www.ncbi.nlm.nih.gov/search/all/?term=ANDV+hantavirus+2026" target="_blank" rel="noopener" class="seq-ext-link">
+              NCBI GenBank
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <a href="https://www.gisaid.org" target="_blank" rel="noopener" class="seq-ext-link">
+              GISAID
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <a href="https://github.com/kraemer-lab/Hondius_hantavirus_h2026/tree/main/data/sequences" target="_blank" rel="noopener" class="seq-ext-link">
+              GitHub repo
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Citation footer bar -->
+  <div class="dash-cite">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+    <span>
+      <strong>Cite:</strong> Global.health: Hondius hantavirus 2026 outbreak data
+      [<span id="citeDate"></span>] ·
+      <a href="https://github.com/kraemer-lab/Hondius_hantavirus_h2026" target="_blank" rel="noopener">kraemer-lab/Hondius_hantavirus_h2026</a> ·
+      CC BY 4.0
+    </span>
+  </div>
+
+</main>
+
+<script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="assets/js/dashboard.js"></script>
+</body>
+</html>
