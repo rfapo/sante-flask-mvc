@@ -1,12 +1,25 @@
-"""Hantawatch subdomain blueprint.
+"""Hantawatch subdomain blueprint — KEPT AS A FALLBACK PATH.
 
-Serves the static Hantawatch outbreak-intelligence site (built by Onicio
-and added 2026-05-14) at https://hantawatch.santehealth.co/. The blueprint
-binds to the subdomain via Flask's subdomain matching; assets are served
-from the same directory.
+Status (2026-05-14): the production deployment serves
+https://hantawatch.santehealth.co/ via **nginx static** directly
+(no Flask involvement) — see /etc/nginx/sites-available/sante. The Flask
+blueprint here is dead code in production: app.py only registers it when
+SERVER_NAME is set in config, and SERVER_NAME is intentionally UNSET on
+the EC2 instance (.env doesn't define it).
 
-The site is intentionally public (no login required). Auth-protected
-routes elsewhere in the Flask app are unaffected.
+Why the pivot from Flask blueprint to nginx-static:
+- Setting SERVER_NAME + SUBDOMAIN_MATCHING in Flask caused demo.santehealth.co
+  to 404 because Flask started rejecting that subdomain as unmatched.
+- The hantawatch project is pure static (HTML/CSS/JS) — nginx serves it
+  more cleanly and with better caching than going through gunicorn.
+- Keeping this blueprint as code lets a future contributor add a dynamic
+  endpoint (e.g., a /api/hantavirus-feed JSON proxy) without re-wiring
+  the architecture: set SERVER_NAME=santehealth.co + add a corresponding
+  nginx `location /api/` block that proxies back to the Flask socket.
+
+If anyone reactivates this path, also update the nginx config to remove
+the static `root` directive for hantawatch.santehealth.co (or keep both
+and route by location prefix).
 """
 from __future__ import annotations
 
