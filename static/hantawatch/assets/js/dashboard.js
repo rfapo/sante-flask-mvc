@@ -4,6 +4,9 @@ const URLS = {
   linelist: `${RAW}/linelist/2026_hantavirus.csv`,
   news:     `${RAW}/news%20sources/hantavirus_articles.json`,
 };
+/* Cache-bust: append timestamp so neither browser cache nor GitHub's Fastly
+   CDN (cache-control max-age=300) ever serves a stale copy on reload. */
+const bust = (u) => u + (u.includes('?') ? '&' : '?') + 't=' + Date.now();
 
 /* ── Chart palette (no cyan — crimson + teal + amber) ── */
 const C = {
@@ -439,11 +442,35 @@ function setupNewsFilters() {
 }
 
 /* ── Data loaders ───────────────────────────────────── */
+/* Map the kraemer-lab Gh CSV schema → the lowercase shape this dashboard uses.
+   The source schema uses Pascal_Snake_Case ("Case_status", "Nationality") and
+   space-containing names ("WHO_case number", "Location_Admin 0"); we normalize
+   once at load time so the rest of the code keeps reading c.status, c.age, etc. */
+function mapRow(r) {
+  return {
+    id:                 r['Gh_ID'] || r['WHO_case number'] || '',
+    status:             r['Case_status'] || '',
+    outcome:            r['Outcome'] || '',
+    nationality:        r['Nationality'] || '',
+    age:                r['Age'] || '',
+    sex:                r['Gender'] || '',
+    travel_from:        r['Travel_from'] || '',
+    travel_to:          r['Travel_to'] || '',
+    symptom_onset:      r['Date_onset'] || '',
+    confirmation_date:  r['Date_confirmation'] || '',
+    /* Keep originals available for any reader that asks by source-column name. */
+    ...r,
+  };
+}
+
 function loadLinelist() {
   return new Promise(res => {
-    Papa.parse(URLS.linelist, {
+    /* No downloadRequestHeaders here: any custom header triggers a CORS
+       preflight that raw.githubusercontent.com doesn't satisfy. The
+       ?t=<ts> query string is enough to defeat the browser + Fastly cache. */
+    Papa.parse(bust(URLS.linelist), {
       download: true, header: true, skipEmptyLines: true,
-      complete: r => res({ ok: true,  data: r.data }),
+      complete: r => res({ ok: true, data: r.data.map(mapRow) }),
       error:    () => res({ ok: false, data: [] }),
     });
   });
@@ -458,7 +485,7 @@ function showDataBanner(msg) {
 
 async function loadNews() {
   try {
-    const r = await fetch(URLS.news);
+    const r = await fetch(bust(URLS.news), { cache: 'no-store' });
     if (!r.ok) return [];
     const parsed = JSON.parse(await r.text());
     return Array.isArray(parsed) ? parsed : (parsed.articles || []);
@@ -496,8 +523,28 @@ async function init() {
   progress(100);
   setTimeout(() => { $('loadFill').style.width = '0'; }, 600);
 
+  renderUpdatedStamp(allCases.length);
+
   // Route to hash after data ready
   routeHash();
+}
+
+/* "Last updated · Refresh" pill — mounts in #updatedStamp if present,
+   otherwise injects itself next to the page title. */
+function renderUpdatedStamp(rowCount) {
+  let host = document.getElementById('updatedStamp');
+  if (!host) {
+    host = document.createElement('div');
+    host.id = 'updatedStamp';
+    host.style.cssText = 'display:inline-flex;gap:10px;align-items:center;font-family:"DM Mono",monospace;font-size:11px;color:#8a94ab;margin-left:14px;';
+    const anchor = document.querySelector('header, .topbar, .sb-cite') || document.body;
+    anchor.appendChild(host);
+  }
+  const stamp = new Date().toLocaleString();
+  host.innerHTML =
+    `<span>● updated ${stamp} · ${rowCount} cases</span>` +
+    `<button id="updatedRefresh" style="background:#0d9488;color:#fff;border:0;border-radius:999px;padding:3px 10px;font-size:11px;cursor:pointer;">Refresh</button>`;
+  document.getElementById('updatedRefresh').addEventListener('click', () => location.reload());
 }
 
 init();
