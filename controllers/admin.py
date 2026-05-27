@@ -152,29 +152,55 @@ def cities_delete(city_id):
 @admin_bp.route("/settings", methods=["GET", "POST"])
 @admin_required
 def settings():
-    if request.method == "POST":
-        openai_key = request.form.get("openai_api_key", "").strip()
-        openai_model = request.form.get("openai_model", "gpt-4o-mini").strip()
+    SETTING_KEYS = [
+        ("llm_provider",   "openai"),
+        ("openai_api_key", ""),
+        ("openai_model",   "gpt-4o-mini"),
+        ("gemini_api_key", ""),
+        ("gemini_model",   "gemini-1.5-flash"),
+    ]
 
-        for key, value in [("openai_api_key", openai_key), ("openai_model", openai_model)]:
+    if request.method == "POST":
+        values = {}
+        for key, default in SETTING_KEYS:
+            values[key] = request.form.get(key, default).strip()
+
+        # Don't overwrite existing key value if the field came back empty
+        # (we render password fields blank on GET to avoid leaking the key in HTML).
+        for key in ("openai_api_key", "gemini_api_key"):
+            if values[key] == "":
+                existing = Settings.query.filter_by(key=key).first()
+                if existing and existing.value:
+                    values[key] = existing.value
+
+        for key, _ in SETTING_KEYS:
             setting = Settings.query.filter_by(key=key).first()
             if setting:
-                setting.value = value
+                setting.value = values[key]
             else:
-                setting = Settings(key=key, value=value)
-                db.session.add(setting)
-
+                db.session.add(Settings(key=key, value=values[key]))
         db.session.commit()
 
-        current_app.config["OPENAI_API_KEY"] = openai_key
-        current_app.config["OPENAI_MODEL"] = openai_model
+        current_app.config["LLM_PROVIDER"]   = values["llm_provider"]
+        current_app.config["OPENAI_API_KEY"] = values["openai_api_key"]
+        current_app.config["OPENAI_MODEL"]   = values["openai_model"]
+        current_app.config["GEMINI_API_KEY"] = values["gemini_api_key"]
+        current_app.config["GEMINI_MODEL"]   = values["gemini_model"]
 
         flash("Settings updated successfully.", "success")
         return redirect(url_for("admin.settings"))
 
-    openai_key_setting = Settings.query.filter_by(key="openai_api_key").first()
-    openai_model_setting = Settings.query.filter_by(key="openai_model").first()
+    # GET — load current values; mask API keys (we only show whether they're set).
+    current = {}
+    for key, default in SETTING_KEYS:
+        setting = Settings.query.filter_by(key=key).first()
+        current[key] = setting.value if setting else default
 
-    return render_template("admin/settings.html",
-                          openai_api_key=openai_key_setting.value if openai_key_setting else "",
-                          openai_model=openai_model_setting.value if openai_model_setting else "gpt-4o-mini")
+    return render_template(
+        "admin/settings.html",
+        llm_provider=current["llm_provider"],
+        openai_api_key_set=bool(current["openai_api_key"]),
+        openai_model=current["openai_model"],
+        gemini_api_key_set=bool(current["gemini_api_key"]),
+        gemini_model=current["gemini_model"],
+    )

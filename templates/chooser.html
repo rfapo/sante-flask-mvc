@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Santé – Choose where to go{% endblock %}
+{% block content %}
+<div class="min-h-[80vh] flex flex-col items-center justify-center px-4 py-12">
+  <div class="text-center mb-10">
+    <img src="{{ url_for('static', filename='sante_logo.png') }}" alt="Santé Logo" class="mx-auto h-16 w-auto mb-6">
+    <h1 class="text-3xl font-bold text-text-light mb-2">Welcome back, {{ current_user.username }}</h1>
+    <p class="text-border-subtle">Pick where you want to go.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full">
+
+    <a href="{{ url_for('cities.list_cities') }}"
+       class="group relative block p-8 rounded-xl border border-border-subtle hover:border-accent-purple bg-background-dark transition-all hover:-translate-y-1 hover:shadow-2xl">
+      <div class="text-4xl mb-4">📊</div>
+      <h2 class="text-2xl font-semibold text-text-light mb-2 group-hover:text-accent-purple transition-colors">
+        Santé Demo
+      </h2>
+      <p class="text-border-subtle text-sm leading-relaxed">
+        The original surveillance app — upload city CSVs, see Rt / R0 / hospitalization
+        dashboards, and generate LLM-backed executive briefs.
+      </p>
+      <span class="absolute top-6 right-6 text-border-subtle group-hover:text-accent-purple text-xl">→</span>
+    </a>
+
+    <a href="/worldcup-2026/"
+       class="group relative block p-8 rounded-xl border border-border-subtle hover:border-accent-purple bg-background-dark transition-all hover:-translate-y-1 hover:shadow-2xl">
+      <div class="text-4xl mb-4">🏆</div>
+      <h2 class="text-2xl font-semibold text-text-light mb-2 group-hover:text-accent-purple transition-colors">
+        Worldcup 2026 Demo
+      </h2>
+      <p class="text-border-subtle text-sm leading-relaxed">
+        Demo-day prototype — 4 persona journeys + citizen channel + product flow.
+        Pitch deck for the FIFA World Cup 2026 pilot.
+      </p>
+      <span class="absolute top-6 right-6 text-border-subtle group-hover:text-accent-purple text-xl">→</span>
+    </a>
+
+    <a href="/simulator/"
+       class="group relative block p-8 rounded-xl border border-border-subtle hover:border-accent-purple bg-background-dark transition-all hover:-translate-y-1 hover:shadow-2xl">
+      <div class="text-4xl mb-4">🧪</div>
+      <h2 class="text-2xl font-semibold text-text-light mb-2 group-hover:text-accent-purple transition-colors">
+        Full Simulator
+      </h2>
+      <p class="text-border-subtle text-sm leading-relaxed">
+        Interactive React prototype — 9 modules: messaging loop, B2B dashboard,
+        offers gallery, impact calculator, data flow, data lake, glossary.
+      </p>
+      <span class="absolute top-6 right-6 text-border-subtle group-hover:text-accent-purple text-xl">→</span>
+    </a>
+
+  </div>
+
+  <div class="mt-10 text-sm text-border-subtle">
+    <a href="{{ url_for('auth.logout') }}" class="hover:text-accent-purple transition-colors">Sign out</a>
+  </div>
+</div>
+{% endblock %}

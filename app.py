@@ -9,6 +9,8 @@ from controllers.cities import cities_bp
 from controllers.dashboard import dashboard_bp
 from controllers.admin import admin_bp
 from controllers.hantawatch import hantawatch_bp
+from controllers.worldcup import worldcup_bp
+from controllers.simulator import simulator_bp
 
 def create_app():
     app = Flask(__name__)
@@ -30,6 +32,8 @@ def create_app():
     app.register_blueprint(cities_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(worldcup_bp)
+    app.register_blueprint(simulator_bp)
     # Hantawatch subdomain (public static site at hantawatch.<SERVER_NAME>).
     # Only active when SERVER_NAME is set in config (production); skipped in dev.
     if app.config.get("SERVER_NAME"):
@@ -38,9 +42,10 @@ def create_app():
     # Routes
     @app.route("/")
     def home():
-        # Landing page explaining the Santé context
+        # Authenticated users see the chooser (Admin vs Copa Demo).
+        # Unauthenticated users go to login.
         if current_user.is_authenticated:
-            return render_template("index.html")
+            return render_template("chooser.html")
         return redirect(url_for("auth.login"))
 
     # CLI command to (re)create DB
@@ -78,12 +83,18 @@ def create_app():
 
 def load_settings_to_config(app):
     """Load settings from database into app config"""
+    mapping = {
+        "llm_provider":   "LLM_PROVIDER",
+        "openai_api_key": "OPENAI_API_KEY",
+        "openai_model":   "OPENAI_MODEL",
+        "gemini_api_key": "GEMINI_API_KEY",
+        "gemini_model":   "GEMINI_MODEL",
+    }
     with app.app_context():
         for setting in Settings.query.all():
-            if setting.key == "openai_api_key":
-                app.config["OPENAI_API_KEY"] = setting.value
-            elif setting.key == "openai_model":
-                app.config["OPENAI_MODEL"] = setting.value
+            cfg_key = mapping.get(setting.key)
+            if cfg_key:
+                app.config[cfg_key] = setting.value
 
 
 if __name__ == "__main__":
