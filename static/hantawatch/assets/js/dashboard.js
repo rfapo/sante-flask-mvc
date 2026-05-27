@@ -349,9 +349,18 @@ function renderMap() {
   if (!leafletMap) {
     leafletMap = L.map('leafletMap', { zoomControl: true }).setView([20, 10], 2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors', maxZoom: 12
+      attribution: '© OpenStreetMap contributors', maxZoom: 12,
+      subdomains: 'abc',
     }).addTo(leafletMap);
     markers = L.layerGroup().addTo(leafletMap);
+
+    /* Keep the map in sync with its container — when the Geography panel
+       toggles from display:none → block, Leaflet must be told to recompute
+       tile coverage, otherwise only a sliver of the world renders. */
+    const observer = new ResizeObserver(() => {
+      if (leafletMap) leafletMap.invalidateSize(false);
+    });
+    observer.observe(mapEl);
   } else {
     markers.clearLayers();
   }
@@ -393,8 +402,11 @@ function renderMap() {
         </div>`).join('');
   }
 
-  // Force map to recalculate size after panel becomes visible
-  setTimeout(() => leafletMap.invalidateSize(), 100);
+  // Force map to recalculate size after panel becomes visible.
+  // Multiple ticks: the panel may still be animating in the first 100ms.
+  [50, 200, 600].forEach(delay =>
+    setTimeout(() => leafletMap && leafletMap.invalidateSize(false), delay)
+  );
 }
 
 /* ── News feed ──────────────────────────────────────── */
@@ -447,7 +459,7 @@ function setupNewsFilters() {
    space-containing names ("WHO_case number", "Location_Admin 0"); we normalize
    once at load time so the rest of the code keeps reading c.status, c.age, etc. */
 function mapRow(r) {
-  return {
+  const mapped = {
     id:                 r['Gh_ID'] || r['WHO_case number'] || '',
     status:             r['Case_status'] || '',
     outcome:            r['Outcome'] || '',
@@ -458,9 +470,24 @@ function mapRow(r) {
     travel_to:          r['Travel_to'] || '',
     symptom_onset:      r['Date_onset'] || '',
     confirmation_date:  r['Date_confirmation'] || '',
+    cruise_crew:        r['Cruise_crew'] || '',
+    cruise_passenger:   r['Cruise_passenger guest'] || r['Cruise_passenger'] || '',
+    location_country:   r['Location_Admin 0'] || '',
+    location_admin1:    r['Location_Admin 1'] || '',
+    location_admin2:    r['Location_Admin 2'] || '',
+    hospitalised:       r['Hospitalised'] || '',
+    intensive_care:     r['Intensive_care'] || '',
+    isolated:           r['Isolated'] || '',
+    symptoms:           r['Symptoms'] || '',
     /* Keep originals available for any reader that asks by source-column name. */
     ...r,
   };
+  /* Legacy R-style keys still referenced by older parts of dashboard.js
+     (chartCrew + transport badge). Defined here so we don't have to touch
+     those readers — they keep working unchanged. */
+  mapped['cruise.crew..y.n.']  = mapped.cruise_crew;
+  mapped['passenger..y.n.']    = mapped.cruise_passenger;
+  return mapped;
 }
 
 function loadLinelist() {
@@ -529,21 +556,29 @@ async function init() {
   routeHash();
 }
 
-/* "Last updated · Refresh" pill — mounts in #updatedStamp if present,
-   otherwise injects itself next to the page title. */
+/* "Last updated · Refresh" pill — fixed-position bottom-right so it doesn't
+   collide with sidebar citation or topbar KPIs. */
 function renderUpdatedStamp(rowCount) {
   let host = document.getElementById('updatedStamp');
   if (!host) {
     host = document.createElement('div');
     host.id = 'updatedStamp';
-    host.style.cssText = 'display:inline-flex;gap:10px;align-items:center;font-family:"DM Mono",monospace;font-size:11px;color:#8a94ab;margin-left:14px;';
-    const anchor = document.querySelector('header, .topbar, .sb-cite') || document.body;
-    anchor.appendChild(host);
+    host.style.cssText = [
+      'position:fixed', 'bottom:14px', 'right:14px', 'z-index:9999',
+      'display:inline-flex', 'gap:8px', 'align-items:center',
+      'background:rgba(11,16,24,0.92)', 'backdrop-filter:blur(6px)',
+      'border:1px solid rgba(255,255,255,0.08)', 'border-radius:999px',
+      'padding:6px 14px',
+      'font-family:"DM Mono",monospace', 'font-size:11px', 'color:#8a94ab',
+      'box-shadow:0 6px 24px rgba(0,0,0,0.4)',
+    ].join(';');
+    document.body.appendChild(host);
   }
   const stamp = new Date().toLocaleString();
   host.innerHTML =
-    `<span>● updated ${stamp} · ${rowCount} cases</span>` +
-    `<button id="updatedRefresh" style="background:#0d9488;color:#fff;border:0;border-radius:999px;padding:3px 10px;font-size:11px;cursor:pointer;">Refresh</button>`;
+    `<span style="color:#0d9488">●</span>` +
+    `<span>${stamp} · ${rowCount} cases</span>` +
+    `<button id="updatedRefresh" style="background:#0d9488;color:#fff;border:0;border-radius:999px;padding:3px 10px;font-size:11px;font-family:inherit;cursor:pointer;">↻ Refresh</button>`;
   document.getElementById('updatedRefresh').addEventListener('click', () => location.reload());
 }
 

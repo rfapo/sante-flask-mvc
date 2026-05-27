@@ -506,11 +506,14 @@ tbody td {
 .sk-news-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; }
 
 /* ── Map ───────────────────────────────────────────── */
-.panel-map { padding: 0; overflow: hidden; }
+/* The Geography section has two direct children — the Leaflet container
+   and the side panel. The default .panel rule applies flex-direction: column,
+   which crushes the map to a 30px sliver. Override to lay them side by side. */
+.panel-map { padding: 0; overflow: hidden; flex-direction: row !important; }
 
 .map-layout-outer { display: flex; flex: 1; height: 100%; overflow: hidden; }
 
-#leafletMap { flex: 1; background: #05080e; }
+#leafletMap { flex: 1; background: #05080e; min-height: 400px; }
 .leaflet-tile-pane { filter: invert(1) hue-rotate(200deg) saturate(.3) brightness(.7); }
 
 .map-panel {
